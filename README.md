@@ -1,0 +1,1 @@
+# sailing-rules-trainer

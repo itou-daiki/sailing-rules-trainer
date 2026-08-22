@@ -11,6 +11,7 @@ import {
   parseProgress,
   recordAnswer,
   selectPracticeQuestions,
+  selectTeamChallengeQuestions,
 } from './learningEngine'
 
 describe('learningEngine', () => {
@@ -130,6 +131,25 @@ describe('learningEngine', () => {
 
     expect(selected).toHaveLength(5)
     expect(selected.every((question) => question.skill === 'right-of-way')).toBe(true)
+  })
+
+  it('部活チャレンジは同じコードなら同じ問題順になる', () => {
+    const options = {
+      skills: ['mark-room'] as const,
+      size: 5,
+      seed: 'MR-ABC234',
+    }
+    const first = selectTeamChallengeQuestions(quizQuestions, {
+      ...options,
+      skills: [...options.skills],
+    })
+
+    const second = selectTeamChallengeQuestions(quizQuestions, {
+      ...options,
+      skills: [...options.skills],
+    })
+
+    expect(second.map((question) => question.id)).toEqual(first.map((question) => question.id))
   })
 
   it('診断結果から推奨コースを設定する', () => {

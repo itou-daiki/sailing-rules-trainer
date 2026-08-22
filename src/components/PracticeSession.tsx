@@ -9,6 +9,8 @@ interface PracticeSessionProps {
   questions: QuizQuestion[]
   sessionLabel?: string
   diagnostic?: boolean
+  shared?: boolean
+  shareUrl?: string
   onAnswer: (
     questionId: string,
     result: { isCorrect: boolean; confidence: Confidence; observationCorrect?: boolean },
@@ -28,6 +30,8 @@ export function PracticeSession({
   questions,
   sessionLabel = '今日の5問',
   diagnostic = false,
+  shared = false,
+  shareUrl,
   onAnswer,
   onComplete,
   onFinish,
@@ -61,7 +65,7 @@ export function PracticeSession({
       ? `／見る力 ${observationCorrectCount}/${observationTotal}`
       : ''
     const resultText = `セーリング・ルール練習帳｜${sessionLabel} ${correctCount}/${questions.length}問正解${observationText}`
-    const url = window.location.href.split('#')[0]
+    const url = shareUrl ?? window.location.href.split('#')[0]
     try {
       if (navigator.share) {
         await navigator.share({ title: 'セーリング・ルール練習帳', text: resultText, url })
@@ -79,9 +83,15 @@ export function PracticeSession({
     const percentage = Math.round((correctCount / questions.length) * 100)
     return (
       <section className="session-result" aria-labelledby="result-title">
-        <p className="eyebrow">{diagnostic ? 'DECK CHECK COMPLETE' : 'SESSION COMPLETE'}</p>
+        <p className="eyebrow">
+          {diagnostic ? 'DECK CHECK COMPLETE' : shared ? 'CLUB CHALLENGE COMPLETE' : 'SESSION COMPLETE'}
+        </p>
         <h1 id="result-title">
-          {diagnostic ? '現在地を確認しました' : '今日の練習、おつかれさま'}
+          {diagnostic
+            ? '現在地を確認しました'
+            : shared
+              ? '一人で考える時間は、ここまで'
+              : '今日の練習、おつかれさま'}
         </h1>
         <div className="result-score">
           <strong>{correctCount}</strong>
@@ -98,7 +108,9 @@ export function PracticeSession({
           </div>
         ) : null}
         <p>
-          {diagnostic
+          {shared
+            ? '点数を比べる前に、答えが分かれた問題を1つ選んでください。'
+            : diagnostic
             ? '結果に合わせて、最初に取り組むコースを選びました。'
             : observationTotal > 0 && observationCorrectCount < observationTotal
               ? '見落とした判断材料を記録し、次回の問題順へ反映しました。'
@@ -106,17 +118,29 @@ export function PracticeSession({
               ? '全問正解です。次は、理由を言葉にしてから答えてみましょう。'
               : '間違いと確信度を記録し、次回の問題順を調整しました。'}
         </p>
+        {shared ? (
+          <aside className="team-debrief" aria-labelledby="team-debrief-title">
+            <span>AFTER QUIZ / 3 MIN</span>
+            <h2 id="team-debrief-title">答えが分かれた1問を話す</h2>
+            <ol>
+              <li><strong>見る</strong><small>最初に図のどこを見た？</small></li>
+              <li><strong>説明</strong><small>その材料から、なぜその答え？</small></li>
+              <li><strong>行動</strong><small>艇上では、いつ何をする？</small></li>
+            </ol>
+            <p>順位は作りません。違う考えを見つけることが、この練習の成果です。</p>
+          </aside>
+        ) : null}
         <div className="button-row">
           {!diagnostic ? (
             <button type="button" className="button button--ink" onClick={onRetry}>
-              別の問題に挑戦
+              {shared ? '同じ6問を解き直す' : '別の問題に挑戦'}
             </button>
           ) : null}
           <button type="button" className="button button--line" onClick={shareResult}>
             結果を共有
           </button>
           <button type="button" className="button button--line" onClick={onFinish}>
-            {diagnostic ? 'おすすめを見る' : 'ホームへ戻る'}
+            {diagnostic ? 'おすすめを見る' : shared ? 'チャレンジ画面へ戻る' : 'ホームへ戻る'}
           </button>
         </div>
         <p className="share-status" aria-live="polite">{shareStatus}</p>

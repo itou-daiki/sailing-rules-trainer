@@ -391,6 +391,20 @@ export const selectPracticeQuestions = (
   return selected
 }
 
+export const selectTeamChallengeQuestions = (
+  questions: QuizQuestion[],
+  options: {
+    skills: SkillId[]
+    size: number
+    seed: string
+  },
+): QuizQuestion[] =>
+  selectPracticeQuestions(questions, createEmptyProgress(), {
+    skills: options.skills,
+    size: options.size,
+    seed: options.seed,
+  })
+
 const calculateStreak = (studyDays: string[], today: Date): number => {
   const days = new Set(studyDays)
   const cursor = new Date(today)

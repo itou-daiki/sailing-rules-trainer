@@ -5,6 +5,7 @@ import { PracticeSession } from './components/PracticeSession'
 import { RuleLibrary } from './components/RuleLibrary'
 import { SignalLibrary } from './components/SignalLibrary'
 import { StartSequenceTrainer } from './components/StartSequenceTrainer'
+import { TeamChallenge } from './components/TeamChallenge'
 import { getCourse, type LearningCourse } from './data/courses'
 import {
   RULESET,
@@ -23,11 +24,17 @@ import {
   recordAnswer,
   saveProgress,
   selectPracticeQuestions,
+  selectTeamChallengeQuestions,
   type Confidence,
   type LearningProgress,
 } from './domain/learningEngine'
+import {
+  buildTeamChallengeUrl,
+  teamChallengeCodeFromHash,
+  type TeamChallengeData,
+} from './domain/teamChallenge'
 
-type Page = 'home' | 'learn' | 'signals' | 'rules' | 'progress' | 'practice'
+type Page = 'home' | 'learn' | 'signals' | 'rules' | 'progress' | 'practice' | 'team'
 
 interface SessionConfig {
   label: string
@@ -35,16 +42,21 @@ interface SessionConfig {
   category?: QuestionCategory
   skills?: SkillId[]
   diagnostic?: boolean
+  shared?: boolean
+  fixedSeed?: string
+  challengeCode?: string
+  shareUrl?: string
 }
 
 const pageFromHash = (): Page => {
-  const page = window.location.hash.replace('#/', '')
+  const page = window.location.hash.replace('#/', '').split('?')[0]
   if (
     page === 'learn' ||
     page === 'signals' ||
     page === 'rules' ||
     page === 'progress' ||
-    page === 'practice'
+    page === 'practice' ||
+    page === 'team'
   ) {
     return page
   }
@@ -100,18 +112,24 @@ export default function App() {
   }
 
   const beginSession = (config: SessionConfig, retry = false) => {
-    const seed = retry
+    const seed = config.fixedSeed ?? (retry
       ? `${Date.now()}`
-      : `${new Date().toLocaleDateString('sv-SE')}:${config.label}`
+      : `${new Date().toLocaleDateString('sv-SE')}:${config.label}`)
     setSessionConfig(config)
     setSessionQuestions(
-      selectPracticeQuestions(quizQuestions, progress, {
-        category: config.category,
-        skills: config.skills,
-        size: config.size,
-        seed,
-        diagnostic: config.diagnostic,
-      }),
+      config.shared && config.skills
+        ? selectTeamChallengeQuestions(quizQuestions, {
+            skills: config.skills,
+            size: config.size,
+            seed,
+          })
+        : selectPracticeQuestions(quizQuestions, progress, {
+            category: config.category,
+            skills: config.skills,
+            size: config.size,
+            seed,
+            diagnostic: config.diagnostic,
+          }),
     )
     window.location.hash = '#/practice'
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -133,6 +151,33 @@ export default function App() {
       size: course.questionCount,
       skills: course.skills,
     })
+
+  const openTeamChallenge = (code?: string) => {
+    window.location.hash = code ? `#/team?code=${encodeURIComponent(code)}` : '#/team'
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const startTeamChallenge = (challenge: TeamChallengeData) => {
+    const course = getCourse(challenge.courseId)
+    if (!course) return
+    beginSession({
+      label: `部活チャレンジ ${challenge.code}｜${course.title}`,
+      size: 6,
+      skills: course.skills,
+      shared: true,
+      fixedSeed: challenge.seed,
+      challengeCode: challenge.code,
+      shareUrl: buildTeamChallengeUrl(window.location.href, challenge.code),
+    })
+  }
+
+  const finishSession = () => {
+    if (sessionConfig.challengeCode) {
+      openTeamChallenge(sessionConfig.challengeCode)
+      return
+    }
+    navigate(sessionConfig.diagnostic ? 'learn' : 'home')
+  }
 
   const handleAnswer = (
     questionId: string,
@@ -209,6 +254,7 @@ export default function App() {
               const course = getCourse('start-line')
               if (course) startCourse(course)
             }}
+            onTeam={() => openTeamChallenge()}
           />
         ) : null}
         {page === 'learn' ? (
@@ -228,6 +274,15 @@ export default function App() {
             onStart={() => startPractice()}
           />
         ) : null}
+        {page === 'team' ? (
+          <TeamChallenge
+            key={teamChallengeCodeFromHash(window.location.hash) ?? 'new'}
+            initialCode={teamChallengeCodeFromHash(window.location.hash)}
+            onStart={startTeamChallenge}
+            onCodeChange={openTeamChallenge}
+            onBack={() => navigate('home')}
+          />
+        ) : null}
         {page === 'practice' ? (
           <PracticeSession
             key={sessionQuestions.map((question) => question.id).join(':')}
@@ -236,7 +291,9 @@ export default function App() {
             diagnostic={sessionConfig.diagnostic}
             onAnswer={handleAnswer}
             onComplete={handleSessionComplete}
-            onFinish={() => navigate(sessionConfig.diagnostic ? 'learn' : 'home')}
+            shared={sessionConfig.shared}
+            shareUrl={sessionConfig.shareUrl}
+            onFinish={finishSession}
             onRetry={() => beginSession(sessionConfig, true)}
           />
         ) : null}
@@ -295,6 +352,7 @@ interface HomePageProps {
   onDiagnostic: () => void
   onNavigate: (page: 'learn' | 'signals' | 'rules') => void
   onStartSequence: () => void
+  onTeam: () => void
 }
 
 function HomePage({
@@ -304,6 +362,7 @@ function HomePage({
   onDiagnostic,
   onNavigate,
   onStartSequence,
+  onTeam,
 }: HomePageProps) {
   const hasDiagnostic = progress.diagnostic !== null
   return (
@@ -357,6 +416,29 @@ function HomePage({
       </section>
 
       <StartSequenceTrainer onPractice={onStartSequence} />
+
+      <section className="team-invite" aria-labelledby="team-invite-title">
+        <div className="team-invite__index" aria-hidden="true">
+          <span>CLUB</span>
+          <strong>06</strong>
+          <small>MIN</small>
+        </div>
+        <div className="team-invite__body">
+          <p className="eyebrow">FOR CAPTAIN / COACH / TEAM</p>
+          <h2 id="team-invite-title">部活で、全員に同じ6問を配る</h2>
+          <p>
+            アカウントも順位表も不要。まず各自で答え、最後に「どこを見たか」を比べます。
+          </p>
+        </div>
+        <ol className="team-invite__steps" aria-label="利用手順">
+          <li><span>01</span>コードを作る</li>
+          <li><span>02</span>一人で解く</li>
+          <li><span>03</span>理由を話す</li>
+        </ol>
+        <button type="button" className="button button--signal" onClick={onTeam}>
+          部活チャレンジを作る <span aria-hidden="true">→</span>
+        </button>
+      </section>
 
       <section className="home-route" aria-labelledby="route-title">
         <div className="section-heading">

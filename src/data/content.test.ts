@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { coreRules, quizQuestions, raceSignals, skillDefinitions } from './content'
+import {
+  allSignals,
+  coreRules,
+  quizQuestions,
+  raceSignals,
+  skillDefinitions,
+  specialSignals,
+} from './content'
 
 describe('教材データ', () => {
-  it('42問すべてに一意なIDと有効な正解を持つ', () => {
-    expect(quizQuestions).toHaveLength(42)
-    expect(new Set(quizQuestions.map((question) => question.id)).size).toBe(42)
+  it('47問すべてに一意なIDと有効な正解を持つ', () => {
+    expect(quizQuestions).toHaveLength(47)
+    expect(new Set(quizQuestions.map((question) => question.id)).size).toBe(47)
 
     for (const question of quizQuestions) {
       expect(question.choices.length).toBeGreaterThanOrEqual(2)
@@ -20,18 +27,20 @@ describe('教材データ', () => {
     }
   })
 
-  it('公式レース信号26パターンを各1問で確認できる', () => {
+  it('基本26パターンと追加信号5種を各1問で確認できる', () => {
     const signalQuestionFlagIds = quizQuestions
       .filter((question) => question.category === 'signal')
       .map((question) => question.flagId)
 
-    expect(signalQuestionFlagIds).toHaveLength(raceSignals.length)
+    expect(signalQuestionFlagIds).toHaveLength(allSignals.length)
     expect(new Set(signalQuestionFlagIds)).toEqual(
-      new Set(raceSignals.map((signal) => signal.id)),
+      new Set(allSignals.map((signal) => signal.id)),
     )
 
     expect(raceSignals).toHaveLength(26)
-    const signalIds = new Set(raceSignals.map((signal) => signal.id))
+    expect(specialSignals).toHaveLength(5)
+    expect(allSignals).toHaveLength(31)
+    const signalIds = new Set(allSignals.map((signal) => signal.id))
     for (const id of [
       'ap-h',
       'ap-a',
@@ -43,6 +52,11 @@ describe('教材データ', () => {
       'c-port',
       'c-shorter',
       'c-longer',
+      'o-rule42',
+      'r-rule42',
+      'yellow-penalty',
+      'red-protest',
+      'd-ashore',
     ]) {
       expect(signalIds).toContain(id)
     }

@@ -772,6 +772,46 @@ a {
   border-bottom: 1px solid var(--line-dark);
 }
 
+.signal-ledger__section-title {
+  display: grid;
+  grid-template-columns: 150px 1fr auto;
+  align-items: center;
+  gap: 22px;
+  margin-top: 28px;
+  padding: 15px 18px;
+  border-top: 6px solid var(--navy);
+  border-bottom: 1px solid var(--navy);
+  color: var(--navy);
+  background: #edf3f2;
+}
+
+.signal-ledger__section-title--special {
+  margin-top: 64px;
+  border-top-color: var(--red);
+  background: #f5f0df;
+}
+
+.signal-ledger__section-title span {
+  color: var(--sea);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.signal-ledger__section-title--special span {
+  color: var(--red);
+}
+
+.signal-ledger__section-title strong {
+  font-size: 18px;
+}
+
+.signal-ledger__section-title small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
 .signal-row {
   display: grid;
   grid-template-columns: 42px 180px 1fr;
@@ -2452,6 +2492,16 @@ a {
   .signal-row {
     grid-template-columns: 30px 145px 1fr;
     gap: 20px;
+  }
+
+  .signal-ledger__section-title {
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding: 15px 13px;
+  }
+
+  .signal-ledger__section-title--special {
+    margin-top: 48px;
   }
 
   .flag-artwork--compact {

@@ -23,6 +23,11 @@ type RectFlagKind =
   | 'm'
   | 'orange'
   | 'blue'
+  | 'o'
+  | 'r'
+  | 'yellow'
+  | 'red'
+  | 'd'
 
 type AtomicFlagKind = RectFlagKind | 'ap' | 'first-sub' | 'a' | 'h' | 'pennant-1'
 
@@ -143,6 +148,32 @@ const RectFlag = ({ kind }: { kind: RectFlagKind }) => {
       return <rect width="180" height="120" fill="#ed6a2c" />
     case 'blue':
       return <rect width="180" height="120" fill="#155b9a" />
+    case 'o':
+      return (
+        <>
+          <rect width="180" height="120" fill="#f0d938" />
+          <path d="M0 0h180v120z" fill="#e81f2b" />
+        </>
+      )
+    case 'r':
+      return (
+        <>
+          <rect width="180" height="120" fill="#e81f2b" />
+          <rect x="75" width="30" height="120" fill="#f0d938" />
+          <rect y="45" width="180" height="30" fill="#f0d938" />
+        </>
+      )
+    case 'yellow':
+      return <rect width="180" height="120" fill="#f0d938" />
+    case 'red':
+      return <rect width="180" height="120" fill="#e81f2b" />
+    case 'd':
+      return (
+        <>
+          <rect width="180" height="120" fill="#f0d938" />
+          <rect y="40" width="180" height="40" fill="#155b9a" />
+        </>
+      )
   }
 }
 

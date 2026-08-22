@@ -25,8 +25,19 @@ export type FlagArtworkKind =
   | 'm'
   | 'orange'
   | 'blue'
+  | 'o'
+  | 'r'
+  | 'yellow'
+  | 'red'
+  | 'd'
 
-export type SignalStage = 'スタート前' | 'スタート' | 'レース中' | 'コース' | '安全'
+export type SignalStage =
+  | 'スタート前'
+  | 'スタート'
+  | 'レース中'
+  | 'コース'
+  | '安全'
+  | '追加信号'
 
 export interface RaceSignal {
   id: string
@@ -436,6 +447,70 @@ export const raceSignals: RaceSignal[] = [
   },
 ]
 
+// These signals are not all part of the RRS inside-cover “Race Signals” table.
+// Their meanings depend on Appendix P, another rule, class rules, or the sailing instructions.
+// RRS source: https://www.sailing.org/wp-content/uploads/2026/04/2025-2028-RRS-with-Changes-and-Corrections.pdf
+// Current JSAF SI guides: https://www.jsaf.or.jp/hp/about/committee/rule/rule-form
+export const specialSignals: RaceSignal[] = [
+  {
+    id: 'o-rule42',
+    code: 'O',
+    name: 'O旗（規則42の緩和）',
+    artwork: 'o',
+    stage: '追加信号',
+    summary: 'クラス規則で定めたパンピング、ロッキング、ウーチングを許可する。',
+    sailorAction: '「何が許されるか」をクラス規則で確認する。O旗だけでスカリングまで許されるとは考えない。',
+    detail: '付則P5が適用されるクラスだけで使用する。スタート後にマークで反復音響信号とともに出た場合は、そのマークを通過した後からクラス規則の緩和が適用される。',
+    reference: '付則P5.1、P5.2、P5.3(a)',
+  },
+  {
+    id: 'r-rule42',
+    code: 'R',
+    name: 'R旗（規則42へ戻る）',
+    artwork: 'r',
+    stage: '追加信号',
+    summary: 'O旗による緩和を終え、クラス規則で変更された規則42へ戻す。',
+    sailorAction: 'スタート後にマークで見たら、そのマーク通過後はO旗で許されていた動作をやめる。',
+    detail: '付則P5が適用され、先にO旗が使われた場合の信号。スタート後は反復音響信号とともにマークで表示され、そのマーク通過後から適用される。',
+    reference: '付則P5.2(b)、P5.3(b)',
+  },
+  {
+    id: 'yellow-penalty',
+    code: 'YELLOW',
+    name: '黄旗（ペナルティー）',
+    artwork: 'yellow',
+    stage: '追加信号',
+    summary: '誰がどう示したかで、得点ペナルティーまたは規則42の判定になる。',
+    sailorAction: '艇が自ら掲げた旗か、ジャッジが音と声を伴って自艇へ向けた旗かを確認する。',
+    detail: '帆走指示書等で得点ペナルティーを採用する場合、艇は黄旗を掲げてフィニッシュまで保持する。付則Pでは、ジャッジが音響信号、黄旗の指示、声で艇を特定すると規則42のペナルティーとなり、1回目は2回転が基本。',
+    reference: '規則44.3／付則P1.2、P2',
+  },
+  {
+    id: 'red-protest',
+    code: 'RED',
+    name: '赤旗（抗議の意思）',
+    artwork: 'red',
+    stage: '追加信号',
+    summary: '艇体長が6mを超える艇が、抗議の意思を示すときに掲げる。',
+    sailorAction: '最初の合理的な機会に「プロテスト」と声をかけ、必要なら赤旗を目立つように掲げる。',
+    detail: '艇体長6m以下の艇には赤旗掲揚の要件がない。必要な場合は、レース中でなくなるまで掲げ続ける。危険、負傷、重大な損傷などには通知要件の例外がある。',
+    reference: '規則60.2 抗議の意思',
+  },
+  {
+    id: 'd-ashore',
+    code: 'D',
+    name: 'D旗（出艇開始・大会指定）',
+    artwork: 'd',
+    stage: '追加信号',
+    summary: '出艇開始の合図としてよく使われるが、意味と待ち時間は帆走指示書で決まる。',
+    sailorAction: '掲揚前に出艇してよいか、掲揚後何分以降に予告信号かを帆走指示書で確認する。',
+    detail: 'RRS巻頭の共通信号ではない。World Sailingの帆走指示書ガイドでは、音響1声とともに掲揚し、艇が出艇できることや予告信号までの最短時間を大会ごとに定める例が示されている。',
+    reference: '大会の帆走指示書（SI）',
+  },
+]
+
+export const allSignals: RaceSignal[] = [...raceSignals, ...specialSignals]
+
 export const coreRules: CoreRule[] = [
   {
     id: 'r10',
@@ -541,6 +616,10 @@ const signalQuestion = (
           'l',
           'orange',
           'blue',
+          'o-rule42',
+          'r-rule42',
+          'yellow-penalty',
+          'red-protest',
         ].includes(flagId)
         ? 'course-signals'
         : 'start-signals',
@@ -744,6 +823,61 @@ export const quizQuestions: QuizQuestion[] = [
     ['C＋プラスは次のレグの距離変更', '方向変更の緑三角・赤四角と区別する'],
     '規則33／レース信号「Changing the Next Leg」',
     2,
+  ),
+  signalQuestion(
+    'q-o-rule42',
+    'o-rule42',
+    '付則Pが適用されるレースでO旗。O旗だけでは自動的に許されない動作は？',
+    ['クラス規則で指定されたパンピング', 'クラス規則で指定されたロッキング', 'スカリング'],
+    2,
+    'O旗で許されるのは、クラス規則に書かれたパンピング、ロッキング、ウーチングです。スカリングまで自動的に許されるわけではありません。',
+    ['O旗だけで判断せずクラス規則を見る', 'スタート後はO旗を表示したマークの通過後から適用'],
+    '付則P5 FLAGS O AND R',
+    2,
+  ),
+  signalQuestion(
+    'q-r-rule42',
+    'r-rule42',
+    'O旗が適用中です。マークでR旗と反復音響信号。通過後は？',
+    ['O旗による緩和を終える', 'さらにすべての推進動作が自由になる', 'レースが中止になる'],
+    0,
+    'R旗を表示したマークの通過後は、O旗による緩和を終え、クラス規則で変更された規則42へ戻ります。',
+    ['OとRを対で覚える', '切り替わるのは旗を見た瞬間ではなくマーク通過後'],
+    '付則P5.3(b)',
+    2,
+  ),
+  signalQuestion(
+    'q-yellow-appendix-p',
+    'yellow-penalty',
+    '付則Pのジャッジが音を鳴らし、黄旗を自艇へ向け、艇を声で特定しました。イベントで1回目の判定です。基本の行動は？',
+    ['2回転ペナルティーを行う', '黄旗が下がるまで停止する', 'そのまま走ってフィニッシュ後に確認する'],
+    0,
+    '付則Pで1回目の規則42ペナルティーを受けた艇は、2回転ペナルティーを行います。',
+    ['艇が自ら掲げる得点ペナルティーの黄旗と区別', '2回目以降は処置が変わる'],
+    '付則P1.2、P2.1',
+    2,
+  ),
+  signalQuestion(
+    'q-red-protest-six-metres',
+    'red-protest',
+    '艇体長がちょうど6mの艇が、水上で見た接触について抗議します。通常、赤旗の掲揚は？',
+    ['必要', '不要。ただし声で抗議を伝える', 'フィニッシュ後だけ掲げる'],
+    1,
+    '赤旗が必要なのは艇体長が6mを超える艇です。ちょうど6mなら不要ですが、通常は最初の合理的な機会に「プロテスト」と伝えます。',
+    ['「6m以上」ではなく「6mを超える」', '危険・負傷・重大損傷などには通知要件の例外がある'],
+    '規則60.2 抗議の意思',
+    2,
+  ),
+  signalQuestion(
+    'q-d-check-si',
+    'd-ashore',
+    '陸上でD旗が掲揚されました。最初に確認するものは？',
+    ['帆走指示書に書かれた出艇条件と予告信号までの時間', '規則10のタック関係', '黒旗違反艇の掲示番号'],
+    0,
+    'D旗は出艇開始に使われることが多い一方、具体的な意味と時間は大会の帆走指示書で決まります。',
+    ['RRS巻頭の共通信号ではない', '大会ごとの帆走指示書を優先する'],
+    '大会の帆走指示書（SI）',
+    1,
   ),
   {
     id: 'q-r10-port-starboard',
@@ -1124,4 +1258,4 @@ export const quizQuestions: QuizQuestion[] = [
   },
 ]
 
-export const getSignal = (id: string) => raceSignals.find((signal) => signal.id === id)
+export const getSignal = (id: string) => allSignals.find((signal) => signal.id === id)

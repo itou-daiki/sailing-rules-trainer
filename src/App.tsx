@@ -1,24 +1,51 @@
 import { useEffect, useMemo, useState } from 'react'
+import { LearningPath } from './components/LearningPath'
 import { MastMark } from './components/MastMark'
 import { PracticeSession } from './components/PracticeSession'
 import { RuleLibrary } from './components/RuleLibrary'
 import { SignalLibrary } from './components/SignalLibrary'
-import { RULESET, quizQuestions, type QuestionCategory, type QuizQuestion } from './data/content'
+import { StartSequenceTrainer } from './components/StartSequenceTrainer'
+import { getCourse, type LearningCourse } from './data/courses'
 import {
+  RULESET,
+  quizQuestions,
+  skillDefinitions,
+  type QuestionCategory,
+  type QuizQuestion,
+  type SkillId,
+} from './data/content'
+import {
+  completeDiagnostic,
   createEmptyProgress,
   getDashboardStats,
+  getSkillStats,
   loadProgress,
   recordAnswer,
   saveProgress,
   selectPracticeQuestions,
+  type Confidence,
   type LearningProgress,
 } from './domain/learningEngine'
 
-type Page = 'home' | 'signals' | 'rules' | 'progress' | 'practice'
+type Page = 'home' | 'learn' | 'signals' | 'rules' | 'progress' | 'practice'
+
+interface SessionConfig {
+  label: string
+  size: number
+  category?: QuestionCategory
+  skills?: SkillId[]
+  diagnostic?: boolean
+}
 
 const pageFromHash = (): Page => {
   const page = window.location.hash.replace('#/', '')
-  if (page === 'signals' || page === 'rules' || page === 'progress' || page === 'practice') {
+  if (
+    page === 'learn' ||
+    page === 'signals' ||
+    page === 'rules' ||
+    page === 'progress' ||
+    page === 'practice'
+  ) {
     return page
   }
   return 'home'
@@ -26,10 +53,13 @@ const pageFromHash = (): Page => {
 
 const navItems: Array<{ id: Exclude<Page, 'practice'>; number: string; label: string }> = [
   { id: 'home', number: '01', label: 'ホーム' },
-  { id: 'signals', number: '02', label: '信号旗' },
-  { id: 'rules', number: '03', label: 'ルール' },
-  { id: 'progress', number: '04', label: '記録' },
+  { id: 'learn', number: '02', label: 'コース' },
+  { id: 'signals', number: '03', label: '信号旗' },
+  { id: 'rules', number: '04', label: 'ルール' },
+  { id: 'progress', number: '05', label: '記録' },
 ]
+
+const dailySession: SessionConfig = { label: '今日の5問', size: 5 }
 
 const loadInitialProgress = (): LearningProgress => {
   try {
@@ -42,6 +72,7 @@ const loadInitialProgress = (): LearningProgress => {
 export default function App() {
   const [page, setPage] = useState<Page>(pageFromHash)
   const [progress, setProgress] = useState<LearningProgress>(loadInitialProgress)
+  const [sessionConfig, setSessionConfig] = useState<SessionConfig>(dailySession)
   const [sessionQuestions, setSessionQuestions] = useState<QuizQuestion[]>(() =>
     selectPracticeQuestions(quizQuestions, loadInitialProgress(), { size: 5 }),
   )
@@ -59,18 +90,56 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const startPractice = (category?: QuestionCategory, retry = false) => {
-    const seed = retry ? `${Date.now()}` : new Date().toLocaleDateString('sv-SE')
+  const beginSession = (config: SessionConfig, retry = false) => {
+    const seed = retry
+      ? `${Date.now()}`
+      : `${new Date().toLocaleDateString('sv-SE')}:${config.label}`
+    setSessionConfig(config)
     setSessionQuestions(
-      selectPracticeQuestions(quizQuestions, progress, { category, size: 5, seed }),
+      selectPracticeQuestions(quizQuestions, progress, {
+        category: config.category,
+        skills: config.skills,
+        size: config.size,
+        seed,
+        diagnostic: config.diagnostic,
+      }),
     )
     window.location.hash = '#/practice'
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleAnswer = (questionId: string, isCorrect: boolean) => {
+  const startPractice = (category?: QuestionCategory) =>
+    beginSession({
+      label: category === 'signal' ? '信号旗チェック' : category === 'rule' ? '状況判断' : '今日の5問',
+      size: 5,
+      category,
+    })
+
+  const startDiagnostic = () =>
+    beginSession({ label: '5領域の現在地チェック', size: 5, diagnostic: true })
+
+  const startCourse = (course: LearningCourse) =>
+    beginSession({
+      label: course.title,
+      size: course.questionCount,
+      skills: course.skills,
+    })
+
+  const handleAnswer = (
+    questionId: string,
+    result: { isCorrect: boolean; confidence: Confidence },
+  ) => {
     setProgress((current) => {
-      const next = recordAnswer(current, questionId, isCorrect)
+      const next = recordAnswer(current, questionId, result)
+      saveProgress(next, window.localStorage)
+      return next
+    })
+  }
+
+  const handleSessionComplete = (correct: number, total: number) => {
+    if (!sessionConfig.diagnostic) return
+    setProgress((current) => {
+      const next = completeDiagnostic(current, correct, total)
       saveProgress(next, window.localStorage)
       return next
     })
@@ -109,7 +178,25 @@ export default function App() {
 
       <main id="main-content" className={page === 'practice' ? 'main main--practice' : 'main'}>
         {page === 'home' ? (
-          <HomePage stats={stats} onStart={() => startPractice()} onNavigate={navigate} />
+          <HomePage
+            progress={progress}
+            stats={stats}
+            onStart={() => startPractice()}
+            onDiagnostic={startDiagnostic}
+            onNavigate={navigate}
+            onStartSequence={() => {
+              const course = getCourse('start-line')
+              if (course) startCourse(course)
+            }}
+          />
+        ) : null}
+        {page === 'learn' ? (
+          <LearningPath
+            progress={progress}
+            questions={quizQuestions}
+            onDiagnostic={startDiagnostic}
+            onStartCourse={startCourse}
+          />
         ) : null}
         {page === 'signals' ? <SignalLibrary onPractice={() => startPractice('signal')} /> : null}
         {page === 'rules' ? <RuleLibrary onPractice={() => startPractice('rule')} /> : null}
@@ -124,9 +211,12 @@ export default function App() {
           <PracticeSession
             key={sessionQuestions.map((question) => question.id).join(':')}
             questions={sessionQuestions}
+            sessionLabel={sessionConfig.label}
+            diagnostic={sessionConfig.diagnostic}
             onAnswer={handleAnswer}
-            onFinish={() => navigate('home')}
-            onRetry={() => startPractice(undefined, true)}
+            onComplete={handleSessionComplete}
+            onFinish={() => navigate(sessionConfig.diagnostic ? 'learn' : 'home')}
+            onRetry={() => beginSession(sessionConfig, true)}
           />
         ) : null}
       </main>
@@ -143,6 +233,13 @@ export default function App() {
               </a>
               <a href={RULESET.jsafUrl} target="_blank" rel="noreferrer">
                 JSAF 正誤表・規則情報
+              </a>
+              <a
+                href="https://github.com/itou-daiki/sailing-rules-trainer/issues/new"
+                target="_blank"
+                rel="noreferrer"
+              >
+                問題の改善を提案
               </a>
               <span>
                 内容確認：{RULESET.currentThrough}／{RULESET.checkedAt}
@@ -170,12 +267,23 @@ export default function App() {
 }
 
 interface HomePageProps {
+  progress: LearningProgress
   stats: ReturnType<typeof getDashboardStats>
   onStart: () => void
-  onNavigate: (page: 'signals' | 'rules') => void
+  onDiagnostic: () => void
+  onNavigate: (page: 'learn' | 'signals' | 'rules') => void
+  onStartSequence: () => void
 }
 
-function HomePage({ stats, onStart, onNavigate }: HomePageProps) {
+function HomePage({
+  progress,
+  stats,
+  onStart,
+  onDiagnostic,
+  onNavigate,
+  onStartSequence,
+}: HomePageProps) {
+  const hasDiagnostic = progress.diagnostic !== null
   return (
     <>
       <section className="hero">
@@ -196,8 +304,12 @@ function HomePage({ stats, onStart, onNavigate }: HomePageProps) {
             信号旗と艇の位置を見て、自分で決める。答えた後に、理由と規則番号を確かめる。
           </p>
           <div className="hero__actions">
-            <button type="button" className="button button--signal" onClick={onStart}>
-              今日の5問を始める
+            <button
+              type="button"
+              className="button button--signal"
+              onClick={hasDiagnostic ? onStart : onDiagnostic}
+            >
+              {hasDiagnostic ? '今日の5問を始める' : '5問で現在地を測る'}
               <span aria-hidden="true">→</span>
             </button>
             <p>登録不要・記録はこの端末だけに保存</p>
@@ -207,8 +319,8 @@ function HomePage({ stats, onStart, onNavigate }: HomePageProps) {
           <p>TODAY'S LOG</p>
           <dl>
             <div>
-              <dt>取り組んだ問題</dt>
-              <dd>{stats.answered}</dd>
+              <dt>今日の復習</dt>
+              <dd>{stats.due}<small>問</small></dd>
             </div>
             <div>
               <dt>正答率</dt>
@@ -222,14 +334,25 @@ function HomePage({ stats, onStart, onNavigate }: HomePageProps) {
         </aside>
       </section>
 
+      <StartSequenceTrainer onPractice={onStartSequence} />
+
       <section className="home-route" aria-labelledby="route-title">
         <div className="section-heading">
           <p className="eyebrow">TWO WAYS IN</p>
           <h2 id="route-title">どちらから始めても、最後は状況判断へ</h2>
         </div>
         <div className="route-grid">
-          <button type="button" className="route-panel route-panel--signal" onClick={() => onNavigate('signals')}>
+          <button type="button" className="route-panel route-panel--course" onClick={() => onNavigate('learn')}>
             <span className="route-panel__number">01</span>
+            <span className="mini-log" aria-hidden="true"><i /><i /><i /><i /></span>
+            <span className="route-panel__body">
+              <strong>学習コース</strong>
+              <small>現在地 → 5分練習 → 復習</small>
+            </span>
+            <span className="route-panel__arrow" aria-hidden="true">→</span>
+          </button>
+          <button type="button" className="route-panel route-panel--signal" onClick={() => onNavigate('signals')}>
+            <span className="route-panel__number">02</span>
             <span className="mini-flag" aria-hidden="true"><i /><i /><i /></span>
             <span className="route-panel__body">
               <strong>信号旗</strong>
@@ -238,7 +361,7 @@ function HomePage({ stats, onStart, onNavigate }: HomePageProps) {
             <span className="route-panel__arrow" aria-hidden="true">→</span>
           </button>
           <button type="button" className="route-panel route-panel--rule" onClick={() => onNavigate('rules')}>
-            <span className="route-panel__number">02</span>
+            <span className="route-panel__number">03</span>
             <span className="mini-course" aria-hidden="true"><i>A</i><i>B</i></span>
             <span className="route-panel__body">
               <strong>基本ルール</strong>
@@ -272,6 +395,7 @@ interface ProgressPageProps {
 }
 
 function ProgressPage({ progress, stats, onStart }: ProgressPageProps) {
+  const skillStats = getSkillStats(progress, quizQuestions)
   const weakQuestions = quizQuestions
     .filter((question) => {
       const record = progress.answers[question.id]
@@ -293,11 +417,30 @@ function ProgressPage({ progress, stats, onStart }: ProgressPageProps) {
       </div>
 
       <dl className="stats-ledger">
-        <div><dt>解いた回数</dt><dd>{stats.attempts}<small>回</small></dd></div>
+        <div><dt>今日の復習</dt><dd>{stats.due}<small>問</small></dd></div>
         <div><dt>正答率</dt><dd>{stats.accuracy}<small>%</small></dd></div>
         <div><dt>習得した問題</dt><dd>{stats.mastered}<small>問</small></dd></div>
         <div><dt>連続学習</dt><dd>{stats.currentStreak}<small>日</small></dd></div>
       </dl>
+
+      <div className="progress-skills">
+        <h2>5領域の習熟度</h2>
+        <dl>
+          {skillDefinitions.map((skill) => {
+            const skillStat = skillStats.find((item) => item.id === skill.id)
+            const mastery = skillStat?.mastery ?? 0
+            return (
+              <div key={skill.id}>
+                <dt>
+                  <span>{skill.name}</span>
+                  <div aria-hidden="true"><i style={{ width: `${mastery}%` }} /></div>
+                </dt>
+                <dd>{mastery}%</dd>
+              </div>
+            )
+          })}
+        </dl>
+      </div>
 
       <div className="weak-list">
         <h2>もう一度見る問題</h2>

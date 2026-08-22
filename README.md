@@ -6,9 +6,13 @@
 
 - レース信号旗16種を「意味」だけでなく「艇上での行動」とセットで確認
 - 規則10〜17の基本を、見るポイントと早合点しやすい点に分けて確認
-- 信号旗・艇の位置図を見て答える5問練習
+- 信号旗・艇の位置図を見て答える32問の問題バンク
+- 5領域の現在地チェックと、5つの段階的な学習コース
+- 規則26のスタート信号を5分前から確認できるタイムライン
 - 解答直後に「結論 → 見るポイント → 正式な用語・規則番号」の順で復習
-- 間違えた問題と未回答問題を、次の練習で優先
+- 正誤と確信度から、誤概念・推測正解・未回答を区別
+- 1、3、7、14、30日の間隔で適応的に復習
+- 練習結果を端末の共有機能またはクリップボードで共有
 - 学習記録をブラウザ内だけに保存
 - スマートフォン、キーボード操作、オフライン利用に対応
 
@@ -37,9 +41,11 @@ npm run build
 
 内容は次の資料を基準に、2026年8月22日に確認しています。
 
-- [World Sailing: Racing Rules of Sailing](https://www.sailing.org/racingrules/) — RRS 2025–2028、2026年4月20日までのChanges and Corrections
-- [日本セーリング連盟: 規則・規定](https://www.jsaf.or.jp/hp/about/committee/rule/rule-reg) — 日本語版の正誤表・規則情報
+- [World Sailing: Racing Rules of Sailing](https://www.sailing.org/racingrules/) — RRS 2025–2028とChanges and Corrections
+- [日本セーリング連盟: 規則・規定](https://www.jsaf.or.jp/hp/about/committee/rule/rule-reg) — 2026年5月30日発行の正誤表-5まで
 - [World Sailing: ERS & RRS Reproduction Policy 2025–2028](https://www.sailing.org/document/ers-rrs-reproduction-policy-2025-2028/) — オンライン掲載・派生物の扱い
+
+競合比較、学習ループ、成功指標、次の成長段階は[製品方針](docs/PRODUCT_STRATEGY.md)に記録しています。
 
 ## デザイン原則
 

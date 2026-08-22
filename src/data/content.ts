@@ -58,22 +58,72 @@ export interface ScenarioDiagram {
 
 export type QuestionCategory = 'signal' | 'rule'
 
+export type SkillId =
+  | 'start-signals'
+  | 'course-signals'
+  | 'safety-signals'
+  | 'right-of-way'
+  | 'rule-limitations'
+
+export interface SkillDefinition {
+  id: SkillId
+  shortName: string
+  name: string
+  description: string
+}
+
 export interface QuizQuestion {
   id: string
   category: QuestionCategory
+  skill: SkillId
+  difficulty: 1 | 2 | 3
   prompt: string
   choices: string[]
   correctIndex: number
   conclusion: string
   points: string[]
   formal: string
+  choiceFeedback?: string[]
   flagId?: string
   diagram?: ScenarioDiagram
 }
 
+export const skillDefinitions: SkillDefinition[] = [
+  {
+    id: 'start-signals',
+    shortName: 'スタート',
+    name: 'スタート信号',
+    description: '予告・準備・リコール・延期を、時系列で判断する。',
+  },
+  {
+    id: 'course-signals',
+    shortName: 'コース',
+    name: 'コースと運営信号',
+    description: '短縮・変更・中止と、ラインの位置を読み取る。',
+  },
+  {
+    id: 'safety-signals',
+    shortName: '安全',
+    name: '安全信号',
+    description: 'PFDと安全通信の指示へ、迷わず反応する。',
+  },
+  {
+    id: 'right-of-way',
+    shortName: '航路権',
+    name: '艇が出会うとき',
+    description: 'タック・重なり・前後から、避ける艇を判定する。',
+  },
+  {
+    id: 'rule-limitations',
+    shortName: '制限',
+    name: '航路権艇の制限',
+    description: '接触回避、航路権の取得、進路変更の限界を判断する。',
+  },
+]
+
 export const RULESET = {
   edition: 'RRS 2025–2028',
-  currentThrough: '2026年4月20日版',
+  currentThrough: 'JSAF正誤表-5（2026年5月30日）',
   checkedAt: '2026年8月22日',
   officialUrl: 'https://www.sailing.org/racingrules/',
   jsafUrl: 'https://www.jsaf.or.jp/hp/about/committee/rule/rule-reg',
@@ -334,9 +384,17 @@ const signalQuestion = (
   conclusion: string,
   points: string[],
   formal: string,
+  difficulty: 1 | 2 | 3 = 1,
 ): QuizQuestion => ({
   id,
   category: 'signal',
+  skill:
+    flagId === 'y' || flagId === 'v'
+      ? 'safety-signals'
+      : ['s', 'c', 'n', 'm', 'l', 'orange', 'blue'].includes(flagId)
+        ? 'course-signals'
+        : 'start-signals',
+  difficulty,
   flagId,
   prompt,
   choices,
@@ -430,6 +488,8 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'q-r10-port-starboard',
     category: 'rule',
+    skill: 'right-of-way',
+    difficulty: 1,
     prompt: 'A艇はポートタック、B艇はスターボードタック。衝突コースです。避けるのは？',
     choices: ['A艇', 'B艇', '両艇が同じだけ避ける'],
     correctIndex: 0,
@@ -447,6 +507,8 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'q-r11-windward',
     category: 'rule',
+    skill: 'right-of-way',
+    difficulty: 1,
     prompt: '同じタックで横に重なっています。A艇は風上、B艇は風下。避けるのは？',
     choices: ['A艇', 'B艇', '後から重なった艇'],
     correctIndex: 0,
@@ -465,6 +527,8 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'q-r12-astern',
     category: 'rule',
+    skill: 'right-of-way',
+    difficulty: 1,
     prompt: '同じタックで、A艇はB艇の完全に後ろです。避けるのは？',
     choices: ['前のB艇', '後ろのA艇', '風上側に近い艇'],
     correctIndex: 1,
@@ -482,6 +546,8 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'q-r13-tacking',
     category: 'rule',
+    skill: 'right-of-way',
+    difficulty: 2,
     prompt: 'A艇は風位を越えた直後で、まだクローズホールドではありません。この間、避けるのは？',
     choices: ['タッキング中のA艇', 'まっすぐ走るB艇', 'スターボード側の艇'],
     correctIndex: 0,
@@ -500,6 +566,8 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'q-r14-contact',
     category: 'rule',
+    skill: 'rule-limitations',
+    difficulty: 1,
     prompt: 'B艇が避けていないことが明らかです。A艇には航路権がありますが、今なら接触を避けられます。A艇は？',
     choices: ['接触を避ける動作をする', '航路を保ち必ず接触する', '抗議するまで進路を変えない'],
     correctIndex: 0,
@@ -517,6 +585,8 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'q-r15-room',
     category: 'rule',
+    skill: 'rule-limitations',
+    difficulty: 2,
     prompt: 'A艇が動作して新たに航路権を得ました。B艇にはすぐ避ける空間がありません。A艇は？',
     choices: ['最初にB艇へ避ける余地を与える', '航路権を得たのでそのまま押し出す', 'B艇が必ず失格になる'],
     correctIndex: 0,
@@ -535,6 +605,8 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'q-r16-course-change',
     category: 'rule',
+    skill: 'rule-limitations',
+    difficulty: 2,
     prompt: '航路権のあるA艇が進路を変えます。最も大切な条件は？',
     choices: ['B艇に避ける余地を与える', 'A艇が先に声を出す', '風上へだけ進路変更する'],
     correctIndex: 0,
@@ -553,6 +625,8 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'q-r17-proper-course',
     category: 'rule',
+    skill: 'rule-limitations',
+    difficulty: 3,
     prompt: 'B艇がクリア・アスターンから2艇身以内でA艇の風下に重なりました。重なりが続く間、B艇への主な制限は？',
     choices: ['プロパー・コースより風上を帆走しない', '必ずA艇の後ろへ戻る', 'タックしてはいけない'],
     correctIndex: 0,
@@ -567,6 +641,226 @@ export const quizQuestions: QuizQuestion[] = [
         { id: 'B', label: '風下・後方から', x: 61, y: 56, heading: 0, tack: 'starboard' },
       ],
     },
+  },
+  signalQuestion(
+    'q-p-preparatory',
+    'p',
+    'P旗が掲揚されました。スタート手順では何の信号？',
+    ['予告信号', '準備信号', 'スタート信号'],
+    1,
+    'P旗は通常の準備信号です。スタート4分前が基準です。',
+    ['クラス旗の予告信号と分ける', 'P旗は特別なスタート・ペナルティを追加しない'],
+    '規則26／レース信号「準備信号」',
+  ),
+  signalQuestion(
+    'q-i-return-route',
+    'i',
+    'I旗の残り1分でラインを越えました。正しい戻り方は？',
+    ['その場でラインを横切って戻る', 'どちらかの端の外側を回って戻る', '第1マークを回ってから戻る'],
+    1,
+    'スタート・ラインの延長線の外側へ出て、端を回って戻ります。',
+    ['I旗はラウンド・アン・エンド', '他艇を避けながら戻る'],
+    '規則30.1 I旗規則',
+    2,
+  ),
+  signalQuestion(
+    'q-black-after-recall',
+    'black',
+    '黒旗の残り1分で三角形に入り、艇番号を識別されました。一般リコール後は？',
+    ['次のスタートへ通常どおり参加する', '厳しい制限が続くので掲示と規則を確認する', 'X旗が出るまで待つ'],
+    1,
+    '黒旗違反は一般リコール後も重大です。艇番号の掲示を確認します。',
+    ['U旗との違いを確認する', '「やり直しだからリセット」と考えない'],
+    '規則30.4 黒旗規則',
+    3,
+  ),
+  signalQuestion(
+    'q-n-abandoned',
+    'n',
+    'レース中にN旗と3声。最初の行動は？',
+    ['そのままフィニッシュする', 'スタート・エリアへ戻る', '最寄りのマークで待つ'],
+    1,
+    '進行中のレースは中止です。スタート・エリアへ戻ります。',
+    ['N旗は中止信号', '追加旗があれば、その日の予定も合わせて読む'],
+    'レース信号「中止信号」',
+  ),
+  signalQuestion(
+    'q-m-replacement',
+    'm',
+    'M旗を掲げ、反復音響信号を出す艇がいます。この艇は？',
+    ['なくなったマークの代わり', 'フィニッシュ・ラインの一端', '救助艇だけを示す'],
+    0,
+    'その艇または物体が、なくなったマークの代わりです。',
+    ['青地に白いXがM旗', '指定された側で正しく回る'],
+    '規則34 マークの消失',
+    2,
+  ),
+  signalQuestion(
+    'q-l-location',
+    'l',
+    'L旗は、どこに掲揚されたかで行動が変わります。正しい組み合わせは？',
+    ['陸上＝通知を確認／海上＝近づく・ついて行く', '陸上＝帰港／海上＝PFD着用', '陸上＝延期／海上＝中止'],
+    0,
+    '陸上なら通知を確認し、海上なら近づくか、その艇について行きます。',
+    ['旗だけでなく掲揚場所を見る', '同じL旗でも行動が二つある'],
+    'レース信号「その他の信号」',
+    2,
+  ),
+  signalQuestion(
+    'q-orange-start-end',
+    'orange',
+    'レース委員会艇のオレンジ旗は、何の一端を示す？',
+    ['スタート・ライン', 'フィニッシュ・ライン', 'ゾーンの境界'],
+    0,
+    'オレンジ旗はスタート・ラインの一端を示します。',
+    ['反対側のスタート・マークと結ぶ', '青旗のフィニッシュ位置と対で覚える'],
+    'レース信号「その他の信号」',
+  ),
+  signalQuestion(
+    'q-blue-finish-end',
+    'blue',
+    'レース委員会艇の青旗が示すものは？',
+    ['準備信号', 'フィニッシュ位置', 'コース変更'],
+    1,
+    '青旗はレース委員会艇がフィニッシュ位置にいることを示します。',
+    ['もう一方の端とフィニッシュ・ラインを結ぶ', 'スタートのオレンジ旗と区別する'],
+    'レース信号「その他の信号」',
+  ),
+  {
+    id: 'q-r10-identify-tack',
+    category: 'rule',
+    skill: 'right-of-way',
+    difficulty: 1,
+    prompt: '艇のブームが左舷側に出ています。この艇のタックは？',
+    choices: ['ポートタック', 'スターボードタック', 'ブームだけでは必ず不明'],
+    correctIndex: 1,
+    conclusion: '風を右舷側から受けているため、スターボードタックです。',
+    points: ['ブームの反対側から風を受けている', '進行方向の左右だけで決めない'],
+    formal: '定義「タック、スターボードまたはポート」',
+    choiceFeedback: [
+      'ブーム側とタックを同じだと考えています。風を受ける側を見ます。',
+      '風を受ける側から正しく判断できています。',
+      '通常の帆走状態なら、ブーム位置は有力な手がかりです。',
+    ],
+  },
+  {
+    id: 'q-r11-order',
+    category: 'rule',
+    skill: 'right-of-way',
+    difficulty: 2,
+    prompt: '風上艇・風下艇を判断する前に、最初に確認することは？',
+    choices: ['両艇が同じタックか', 'どちらの艇速が高いか', 'どちらが先に声を出したか'],
+    correctIndex: 0,
+    conclusion: 'まず同一タックか確認し、その後に重なりと風上・風下を見ます。',
+    points: ['判断順序を固定する', '反対タックなら規則10から考える'],
+    formal: '規則10・11',
+    choiceFeedback: [
+      '正しい順序です。タックが違えば別の規則から判断します。',
+      '艇速は航路権を直接決めません。',
+      '声を出した順では航路権は決まりません。',
+    ],
+  },
+  {
+    id: 'q-r12-overlap-switch',
+    category: 'rule',
+    skill: 'right-of-way',
+    difficulty: 2,
+    prompt: '後ろのA艇が追いつき、B艇の風下でオーバーラップしました。判断はどう変わる？',
+    choices: ['規則12のまま', '風上・風下の関係を確認する', '両艇とも航路権を失う'],
+    correctIndex: 1,
+    conclusion: 'オーバーラップした瞬間から、風上・風下などの関係を確認します。',
+    points: ['関係が変わる瞬間を見る', '風下艇には規則17が関係する場合もある'],
+    formal: '規則11・12・17',
+    choiceFeedback: [
+      '規則12はオーバーラップしていない間の規則です。',
+      '位置関係の変化に合わせて規則を切り替えられています。',
+      '航路権は消えず、適用規則が変わります。',
+    ],
+  },
+  {
+    id: 'q-r13-end',
+    category: 'rule',
+    skill: 'right-of-way',
+    difficulty: 2,
+    prompt: 'タッキング中として避け続ける義務は、いつ終わる？',
+    choices: ['バウが風位を越えた瞬間', '新しいタックのクローズホールドになったとき', 'セールが反対側へ動いたとき'],
+    correctIndex: 1,
+    conclusion: '新しいタックのクローズホールドになるまで規則13が続きます。',
+    points: ['開始は風位を越えたとき', '終了はクローズホールドになったとき'],
+    formal: '規則13 タッキング中',
+    choiceFeedback: [
+      '風位を越えた瞬間は、規則13が始まる側です。',
+      '開始と終了の二つの境目を正しく区別できています。',
+      'セールの移動だけでは終了を決めません。',
+    ],
+  },
+  {
+    id: 'q-r14-right-not-contact',
+    category: 'rule',
+    skill: 'rule-limitations',
+    difficulty: 1,
+    prompt: '「自艇に航路権がある」の正しい意味は？',
+    choices: ['接触してもよい', '相手が避けるが、自艇にも接触回避義務がある', '進路を自由に変えてよい'],
+    correctIndex: 1,
+    conclusion: '相手は避けますが、航路権艇も合理的に可能なら接触を避けます。',
+    points: ['航路権と接触回避を分ける', '規則14は両艇に関係する'],
+    formal: '規則14 接触の回避',
+    choiceFeedback: [
+      '航路権は接触の許可ではありません。',
+      '航路権と安全上の義務を分けて考えられています。',
+      '進路変更には規則16の制限があります。',
+    ],
+  },
+  {
+    id: 'q-r15-exception',
+    category: 'rule',
+    skill: 'rule-limitations',
+    difficulty: 3,
+    prompt: 'A艇が航路権を得た原因が、B艇自身の動作でした。規則15の「最初に避ける余地」は？',
+    choices: ['常にA艇が与える', 'この場合は例外になり得る', 'スタート前だけ不要'],
+    correctIndex: 1,
+    conclusion: '相手艇の動作によって航路権を得た場合は、規則15の例外になり得ます。',
+    points: ['誰の動作で航路権が変わったかを見る', '一つの回答だけで事実認定を決めない'],
+    formal: '規則15 航路権を得る場合',
+    choiceFeedback: [
+      '規則15には、相手艇の動作で航路権を得た場合の例外があります。',
+      '航路権が変わった原因まで見られています。',
+      'スタート前後ではなく、航路権を得た原因が焦点です。',
+    ],
+  },
+  {
+    id: 'q-r16-escape',
+    category: 'rule',
+    skill: 'rule-limitations',
+    difficulty: 2,
+    prompt: '航路権艇がラフするとき、「避ける余地」があるかは何で判断する？',
+    choices: ['相手艇に対応する時間と空間が残るか', '航路権艇が声を出したか', '風が強いか'],
+    correctIndex: 0,
+    conclusion: '避ける艇がすぐ対応できる時間と空間が残るかを見ます。',
+    points: ['進路変更の速さと距離を見る', 'コールだけでは余地を作れない'],
+    formal: '規則16.1 航路変更',
+    choiceFeedback: [
+      '相手が実際に避けられるかを見られています。',
+      'コールは注意喚起でも、余地そのものではありません。',
+      '風は状況に影響しますが、中心は対応可能な時間と空間です。',
+    ],
+  },
+  {
+    id: 'q-r17-trigger',
+    category: 'rule',
+    skill: 'rule-limitations',
+    difficulty: 3,
+    prompt: '規則17の制限を考える重要な成立条件は？',
+    choices: ['風下艇が後ろから2艇身以内で重なった', '風上艇が先にコールした', '両艇の艇種が違う'],
+    correctIndex: 0,
+    conclusion: '同一タックで、後ろから2艇身以内に風下オーバーラップを作ったかが重要です。',
+    points: ['後ろから重なったか', '2艇身以内か', '重なりが続くか'],
+    formal: '規則17 同一タックでのプロパー・コース',
+    choiceFeedback: [
+      '成立条件をまとめて確認できています。',
+      'コールの順序は規則17の成立条件ではありません。',
+      '艇種の違いは規則17の成立条件ではありません。',
+    ],
   },
 ]
 

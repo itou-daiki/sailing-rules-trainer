@@ -5,4 +5,4 @@ coverage/
 *.tsbuildinfo
 tmp/
 .playwright-cli/
-output/playwright/
+output/

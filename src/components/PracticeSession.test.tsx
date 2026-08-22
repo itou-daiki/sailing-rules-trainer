@@ -6,6 +6,8 @@ import { PracticeSession } from './PracticeSession'
 const question: QuizQuestion = {
   id: 'test-signal',
   category: 'signal',
+  skill: 'start-signals',
+  difficulty: 1,
   flagId: 'x',
   prompt: 'この旗の意味は？',
   choices: ['個別リコール', 'コース短縮', '延期'],
@@ -28,8 +30,12 @@ describe('PracticeSession', () => {
     )
 
     fireEvent.click(screen.getByRole('button', { name: /個別リコール/ }))
+    fireEvent.click(screen.getByRole('button', { name: /自信あり/ }))
 
-    expect(onAnswer).toHaveBeenCalledWith('test-signal', true)
+    expect(onAnswer).toHaveBeenCalledWith('test-signal', {
+      isCorrect: true,
+      confidence: 'sure',
+    })
     expect(screen.getByText('正解')).toBeInTheDocument()
     expect(screen.getByText('結論')).toBeInTheDocument()
     expect(screen.getByText('見るポイント')).toBeInTheDocument()

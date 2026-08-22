@@ -1,0 +1,39 @@
+name: 問題・解説の改善提案
+description: 信号旗、状況問題、解説の誤りや改善案を知らせる
+title: "[教材] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提案ありがとうございます。個人名、大会の非公開情報、公式規則本文の長い転載は記載しないでください。
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 対象
+      options:
+        - 信号旗
+        - 競技規則
+        - 状況図
+        - 日本語の説明
+        - その他
+    validations:
+      required: true
+  - type: input
+    id: question
+    attributes:
+      label: 問題名または規則番号
+      placeholder: 例：X旗、規則10
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 現状と改善案
+      description: 何が分かりにくいか、どう変えると判断しやすいかを書いてください。
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: 確認した公式資料
+      description: URL、版、ページや規則番号。分かる範囲で構いません。

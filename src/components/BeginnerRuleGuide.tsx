@@ -1,28 +1,55 @@
-const TackBoat = ({ side }: { side: 'left' | 'right' }) => {
-  const isRight = side === 'right'
-  const sailX = isRight ? 72 : 28
-  const boomX = isRight ? 69 : 31
-  const color = isRight ? '#c93627' : '#155b9a'
-  const tack = isRight ? 'ポートタック' : 'スターボードタック'
-  const sideLabel = isRight ? '右側（右舷）' : '左側（左舷）'
+const TackBoat = ({ tack }: { tack: 'port' | 'starboard' }) => {
+  const isPort = tack === 'port'
+  const sailX = isPort ? 145 : 55
+  const labelX = isPort ? 157 : 43
+  const rotation = isPort ? 27 : -27
+  const name = isPort ? 'ポートタック' : 'スターボードタック'
+  const sideLabel = isPort ? '右舷側' : '左舷側'
+  const windwardSide = isPort ? '左舷側' : '右舷側'
 
   return (
     <figure className="tack-boat">
-      <svg role="img" aria-label={`帆が艇の${sideLabel}にある${tack}`} viewBox="0 0 100 118">
-        <path d="M50 11 C65 24 66 83 50 104 C34 83 35 24 50 11Z" className="tack-boat__hull" />
-        <path d={`M50 25 L50 88 L${sailX} 67 Z`} fill={color} className="tack-boat__sail" />
-        <path d={`M50 57 L${boomX} 67`} className="tack-boat__boom" />
-        <text x={isRight ? 76 : 24} y="61" textAnchor="middle" className="tack-boat__side-label">
-          帆
-        </text>
+      <svg
+        role="img"
+        aria-label={`風を${windwardSide}から受け、帆が${sideLabel}にある${name}艇`}
+        viewBox="0 0 200 205"
+      >
+        <g transform={`rotate(${rotation} 100 108)`}>
+          <path d="M100 190 V18" className="tack-boat__course-line" />
+          <path d="m100 12-7 12h14Z" className="tack-boat__course-arrow" />
+          <path
+            d="M100 24 C122 42 124 142 100 174 C76 142 78 42 100 24Z"
+            className="tack-boat__hull"
+          />
+          <path d="M100 31 V168" className="tack-boat__centerline" />
+          <path d="M88 103 C88 89 112 89 112 103 V143 C112 156 88 156 88 143Z" className="tack-boat__cockpit" />
+          <path d={`M100 48 L100 139 L${sailX} 116Z`} className={`tack-boat__sail is-${tack}`} />
+          <path d={`M100 82 L${isPort ? 140 : 60} 116`} className="tack-boat__boom" />
+          <circle cx="100" cy="82" r="4" className="tack-boat__mast" />
+          <path d={`M${isPort ? 121 : 79} 111 H${isPort ? 151 : 49}`} className="tack-boat__sail-pointer" />
+          <text x={labelX} y="108" textAnchor="middle" className="tack-boat__side-label">
+            帆
+          </text>
+        </g>
       </svg>
       <figcaption>
-        <span>帆が{sideLabel}</span>
-        <strong>→ {tack}</strong>
+        <span>帆は{sideLabel}</span>
+        <strong>{name}</strong>
+        <small>風を{windwardSide}から受ける</small>
       </figcaption>
     </figure>
   )
 }
+
+const TackWind = () => (
+  <div className="tack-reader__wind">
+    <span>WIND</span>
+    <strong>風は上から</strong>
+    <svg role="img" aria-label="上から下へ吹く風" viewBox="0 0 180 32">
+      <path d="M24 2 V25 M18 18l6 7 6-7 M90 2 V25 M84 18l6 7 6-7 M156 2 V25 M150 18l6 7 6-7" />
+    </svg>
+  </div>
+)
 
 const beginnerTerms = [
   {
@@ -93,9 +120,12 @@ export function BeginnerRuleGuide({ onPractice }: { onPractice: () => void }) {
           </p>
           <p className="tack-reader__memory">右の帆＝ポート ／ 左の帆＝スターボード</p>
         </div>
-        <div className="tack-reader__boats">
-          <TackBoat side="right" />
-          <TackBoat side="left" />
+        <div className="tack-reader__diagram">
+          <TackWind />
+          <div className="tack-reader__boats">
+            <TackBoat tack="port" />
+            <TackBoat tack="starboard" />
+          </div>
         </div>
       </div>
 

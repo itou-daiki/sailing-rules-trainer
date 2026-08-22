@@ -3390,68 +3390,185 @@ a {
   font-weight: 900;
 }
 
+.tack-reader__diagram {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-width: 0;
+}
+
+.tack-reader__wind {
+  display: grid;
+  grid-template-columns: auto auto minmax(100px, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 57px;
+  padding: 9px 22px;
+  border-bottom: 1px solid var(--line-dark);
+  color: var(--navy);
+  background: var(--yellow);
+}
+
+.tack-reader__wind span {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.tack-reader__wind strong {
+  font-size: 13px;
+}
+
+.tack-reader__wind svg {
+  display: block;
+  width: min(100%, 180px);
+  height: 32px;
+  justify-self: end;
+}
+
+.tack-reader__wind path {
+  fill: none;
+  stroke: var(--navy);
+  stroke-linecap: square;
+  stroke-width: 2;
+}
+
 .tack-reader__boats {
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
-  padding: 22px;
+  min-width: 0;
 }
 
 .tack-boat {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-self: stretch;
   margin: 0;
-  padding: 0 18px;
+  padding: 12px 22px 19px;
   border-left: 1px solid var(--line-dark);
+  border-top: 5px solid var(--blue);
+  background: #edf5f5;
   text-align: center;
 }
 
 .tack-boat:first-child {
   border-left: 0;
+  border-top-color: var(--red);
 }
 
 .tack-boat svg {
   display: block;
-  width: min(100%, 170px);
+  width: min(100%, 210px);
+  height: 205px;
   margin: 0 auto;
 }
 
 .tack-boat__hull {
   fill: #f9fbfa;
   stroke: var(--navy);
-  stroke-width: 2;
+  stroke-width: 2.4;
+  vector-effect: non-scaling-stroke;
+}
+
+.tack-boat__centerline {
+  fill: none;
+  stroke: #8aa2a7;
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.tack-boat__cockpit {
+  fill: #dcebed;
+  stroke: var(--navy);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
 }
 
 .tack-boat__sail {
-  stroke: var(--navy);
-  stroke-width: 1.5;
+  stroke: #fff;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.tack-boat__sail.is-port {
+  fill: var(--red);
+}
+
+.tack-boat__sail.is-starboard {
+  fill: var(--blue);
 }
 
 .tack-boat__boom {
   fill: none;
   stroke: var(--navy);
   stroke-linecap: round;
-  stroke-width: 2.5;
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.tack-boat__mast {
+  fill: var(--yellow);
+  stroke: var(--navy);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.tack-boat__course-line {
+  fill: none;
+  stroke: var(--sea);
+  stroke-width: 1.4;
+  stroke-dasharray: 5 5;
+}
+
+.tack-boat__course-arrow {
+  fill: var(--sea);
+}
+
+.tack-boat__sail-pointer {
+  fill: none;
+  stroke: var(--navy);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
 }
 
 .tack-boat__side-label {
   fill: var(--navy);
-  font-size: 8px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
   font-weight: 900;
 }
 
+.tack-boat figcaption {
+  min-height: 79px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-dark);
+}
+
 .tack-boat figcaption span,
-.tack-boat figcaption strong {
+.tack-boat figcaption strong,
+.tack-boat figcaption small {
   display: block;
 }
 
 .tack-boat figcaption span {
-  color: #46545d;
-  font-size: 12px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .tack-boat figcaption strong {
-  margin-top: 6px;
+  margin-top: 4px;
   color: var(--navy);
-  font-size: 15px;
+  font-size: 18px;
+}
+
+.tack-boat figcaption small {
+  margin-top: 5px;
+  color: var(--sea);
+  font-size: 10px;
+  font-weight: 800;
 }
 
 .term-drawer,
@@ -3906,20 +4023,54 @@ a {
     font-size: 22px;
   }
 
+  .tack-reader__wind {
+    grid-template-columns: auto 1fr;
+    padding: 9px 16px;
+  }
+
+  .tack-reader__wind svg {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: none;
+    justify-self: stretch;
+  }
+
   .tack-reader__boats {
-    padding: 16px 8px 20px;
+    grid-template-columns: 1fr;
   }
 
   .tack-boat {
-    padding: 0 5px;
+    grid-template-columns: minmax(135px, 0.75fr) minmax(150px, 1fr);
+    grid-template-rows: 1fr;
+    gap: 14px;
+    align-items: center;
+    padding: 10px 14px;
+    border-top: 1px solid var(--line-dark);
+    border-left: 0;
+    text-align: left;
   }
 
-  .tack-boat figcaption span {
-    font-size: 10px;
+  .tack-boat:first-child {
+    border-top: 5px solid var(--red);
+  }
+
+  .tack-boat:last-child {
+    border-top: 5px solid var(--blue);
+  }
+
+  .tack-boat svg {
+    width: 100%;
+    height: 175px;
+  }
+
+  .tack-boat figcaption {
+    min-height: 0;
+    padding: 0;
+    border-top: 0;
   }
 
   .tack-boat figcaption strong {
-    font-size: 12px;
+    font-size: 16px;
   }
 
   .term-drawer > summary,

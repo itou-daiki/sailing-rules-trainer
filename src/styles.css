@@ -2133,11 +2133,11 @@ a {
 
 .course-list > li {
   display: grid;
-  grid-template-columns: 105px 1fr 180px;
-  min-height: 180px;
+  grid-template-columns: 105px 220px minmax(0, 1fr) 180px;
+  min-height: 214px;
   border-bottom: 1px solid var(--line-dark);
   content-visibility: auto;
-  contain-intrinsic-size: 180px;
+  contain-intrinsic-size: 214px;
 }
 
 .course-list > li.is-recommended {
@@ -2170,10 +2170,10 @@ a {
 
 .course-list__body {
   display: grid;
-  grid-template-columns: 1fr 0.9fr;
-  gap: 36px;
+  grid-template-columns: 1fr;
+  gap: 18px;
   align-items: center;
-  padding: 28px 34px;
+  padding: 28px 30px;
 }
 
 .course-list__body h2 {
@@ -2199,8 +2199,8 @@ a {
 }
 
 .course-list__outcome {
-  padding-left: 24px;
-  border-left: 1px solid var(--line);
+  padding-top: 15px;
+  border-top: 1px solid var(--line);
 }
 
 .course-list__outcome span {
@@ -2247,6 +2247,191 @@ a {
 .course-list__action button:hover {
   color: #fff;
   background: var(--navy);
+}
+
+.course-boat-art {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  min-width: 0;
+  margin: 0;
+  padding: 21px 20px 18px;
+  border-right: 1px solid var(--line-dark);
+  background: #e4eff0;
+}
+
+.course-boat-art svg {
+  display: block;
+  width: 100%;
+  height: 150px;
+}
+
+.course-boat-art figcaption {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 9px;
+  align-items: baseline;
+  min-height: 32px;
+  padding-top: 9px;
+  border-top: 1px solid #8ca6aa;
+}
+
+.course-boat-art figcaption span {
+  color: var(--red);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.course-boat-art figcaption strong {
+  color: var(--navy);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.course-boat-art__grid {
+  fill: none;
+  stroke: #9eb8bc;
+  stroke-width: 0.6;
+  stroke-dasharray: 2 5;
+}
+
+.course-boat-art__hull {
+  fill: #fff;
+  stroke: var(--navy);
+  stroke-width: 2.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.course-boat-art__sail {
+  stroke: #fff;
+  stroke-width: 1.3;
+  vector-effect: non-scaling-stroke;
+}
+
+.course-boat-art__sail.is-port,
+.course-boat-art__key .is-port {
+  fill: var(--red);
+}
+
+.course-boat-art__sail.is-starboard,
+.course-boat-art__key .is-starboard {
+  fill: var(--blue);
+}
+
+.course-boat-art__boom,
+.course-boat-art__signal-pole,
+.course-boat-art__wind path,
+.course-boat-art__clock path,
+.course-boat-art__measure {
+  fill: none;
+  stroke: var(--navy);
+  stroke-width: 1.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.course-boat-art__mast {
+  fill: var(--navy);
+}
+
+.course-boat-art__boat-label,
+.course-boat-art__note,
+.course-boat-art__callout,
+.course-boat-art__wind text,
+.course-boat-art__clock text,
+.course-boat-art__key text {
+  fill: var(--navy);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.course-boat-art__callout {
+  fill: var(--red);
+  font-size: 8px;
+}
+
+.course-boat-art__wind path {
+  stroke-width: 1.2;
+}
+
+.course-boat-art__signal {
+  stroke: var(--navy);
+  stroke-width: 1.2;
+}
+
+.course-boat-art__signal.is-yellow {
+  fill: var(--yellow);
+}
+
+.course-boat-art__signal.is-blue {
+  fill: var(--blue);
+}
+
+.course-boat-art__route,
+.course-boat-art__course,
+.course-boat-art__room,
+.course-boat-art__start-line {
+  fill: none;
+  stroke: var(--navy);
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.course-boat-art__route {
+  stroke-dasharray: 5 4;
+}
+
+.course-boat-art__route.is-muted {
+  stroke: var(--red);
+}
+
+.course-boat-art__start-line {
+  stroke: var(--red);
+  stroke-width: 2.4;
+  stroke-dasharray: 5 3;
+}
+
+.course-boat-art__room {
+  stroke: var(--red);
+  stroke-width: 1.2;
+  stroke-dasharray: 2 4;
+}
+
+.course-boat-art__course {
+  stroke: var(--sea);
+  stroke-width: 1.2;
+}
+
+.course-boat-art__measure {
+  stroke: var(--red);
+  stroke-width: 1.2;
+}
+
+.course-boat-art__arrow-head {
+  fill: var(--navy);
+}
+
+.course-boat-art__mark {
+  fill: var(--yellow);
+  stroke: var(--navy);
+  stroke-width: 1.4;
+}
+
+.course-boat-art__mark-flag {
+  fill: var(--red);
+  stroke: var(--navy);
+  stroke-width: 1.1;
+}
+
+.course-boat-art__clock text {
+  font-size: 8px;
+}
+
+.course-boat-art__key circle {
+  stroke: #fff;
+  stroke-width: 1.2;
 }
 
 .skill-chart {
@@ -2506,6 +2691,21 @@ a {
 
   .flag-artwork--compact {
     width: 145px;
+  }
+
+  .course-list > li {
+    grid-template-columns: 82px 190px minmax(0, 1fr);
+  }
+
+  .course-list__order,
+  .course-boat-art {
+    grid-row: 1 / span 2;
+  }
+
+  .course-list__action {
+    grid-column: 3;
+    padding: 0 0 22px 30px;
+    border-left: 0;
   }
 }
 
@@ -3939,7 +4139,7 @@ a {
   }
 
   .course-list__order {
-    grid-row: 1 / span 2;
+    grid-row: 1 / span 3;
     padding: 24px 10px;
   }
 
@@ -3948,9 +4148,23 @@ a {
   }
 
   .course-list__body {
+    grid-column: 2;
     grid-template-columns: 1fr;
     gap: 18px;
     padding: 24px 0 18px 18px;
+  }
+
+  .course-boat-art {
+    grid-row: 1;
+    grid-column: 2;
+    margin-left: 18px;
+    padding: 14px 14px 12px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line-dark);
+  }
+
+  .course-boat-art svg {
+    height: 144px;
   }
 
   .course-list__outcome {

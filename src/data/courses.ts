@@ -1,5 +1,7 @@
 import type { SkillId } from './content'
 
+export type CourseArtworkKind = 'signals' | 'start' | 'meeting' | 'room' | 'race'
+
 export interface LearningCourse {
   id: string
   order: number
@@ -7,6 +9,8 @@ export interface LearningCourse {
   title: string
   shortDescription: string
   outcome: string
+  artwork: CourseArtworkKind
+  artworkCaption: string
   skills: SkillId[]
   questionCount: number
 }
@@ -19,6 +23,8 @@ export const learningCourses: LearningCourse[] = [
     title: '旗を見て動く',
     shortDescription: 'スタート・安全・コース信号の基礎',
     outcome: '旗を見た直後の行動を言える。',
+    artwork: 'signals',
+    artworkCaption: '旗を見る → 次の行動を決める',
     skills: ['start-signals', 'course-signals', 'safety-signals'],
     questionCount: 6,
   },
@@ -29,6 +35,8 @@ export const learningCourses: LearningCourse[] = [
     title: '5分前からスタート',
     shortDescription: '予告、準備、1分、リコール',
     outcome: '信号を時系列で読み、戻り方を選べる。',
+    artwork: 'start',
+    artworkCaption: '時間を読む → ラインへ入る',
     skills: ['start-signals'],
     questionCount: 5,
   },
@@ -39,6 +47,8 @@ export const learningCourses: LearningCourse[] = [
     title: '艇が出会うとき',
     shortDescription: '反対タック、風上・風下、前・後',
     outcome: '規則10〜13の判断順序を使える。',
+    artwork: 'meeting',
+    artworkCaption: '帆の側を見る → 避ける艇を決める',
     skills: ['right-of-way'],
     questionCount: 5,
   },
@@ -49,6 +59,8 @@ export const learningCourses: LearningCourse[] = [
     title: '航路権にも限界がある',
     shortDescription: '接触回避、取得、進路変更',
     outcome: '航路権艇側の義務まで説明できる。',
+    artwork: 'room',
+    artworkCaption: '優先でも → 相手の逃げ場を残す',
     skills: ['rule-limitations'],
     questionCount: 5,
   },
@@ -59,6 +71,8 @@ export const learningCourses: LearningCourse[] = [
     title: 'レース前チェック',
     shortDescription: '信号旗と規則を混ぜた実戦確認',
     outcome: '異なる場面でも判断順序を転用できる。',
+    artwork: 'race',
+    artworkCaption: '信号と規則を → 1つの判断へ',
     skills: [
       'start-signals',
       'course-signals',

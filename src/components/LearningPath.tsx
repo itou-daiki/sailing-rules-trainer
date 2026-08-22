@@ -5,6 +5,7 @@ import {
   type LearningProgress,
   type SkillStats,
 } from '../domain/learningEngine'
+import { CourseBoatDiagram } from './CourseBoatDiagram'
 
 interface LearningPathProps {
   progress: LearningProgress
@@ -67,6 +68,11 @@ export function LearningPath({
                 <span>{String(course.order).padStart(2, '0')}</span>
                 <small>{course.code}</small>
               </div>
+              <CourseBoatDiagram
+                kind={course.artwork}
+                title={course.title}
+                caption={course.artworkCaption}
+              />
               <div className="course-list__body">
                 <div>
                   {recommended ? <span className="recommended-label">おすすめ</span> : null}

@@ -1130,7 +1130,12 @@ a {
   border-top: 1px solid var(--navy);
   color: #4c5c64;
   background: var(--paper-bright);
-  font-size: 9px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.scenario-board figcaption span {
+  display: block;
 }
 
 .scenario-board__water {
@@ -1177,6 +1182,13 @@ a {
   fill: none;
   stroke: var(--red);
   stroke-dasharray: 3 2;
+  stroke-width: 1.2;
+}
+
+.scenario-board__boom {
+  fill: none;
+  stroke: var(--navy);
+  stroke-linecap: round;
   stroke-width: 1.2;
 }
 

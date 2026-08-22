@@ -29,6 +29,8 @@ describe('PracticeSession', () => {
       />,
     )
 
+    expect(screen.getByText('Created by Dit-Lab.')).toBeInTheDocument()
+
     fireEvent.click(screen.getByRole('button', { name: /個別リコール/ }))
     fireEvent.click(screen.getByRole('button', { name: /自信あり/ }))
 

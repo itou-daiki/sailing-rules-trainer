@@ -977,6 +977,22 @@ a {
   margin: 48px auto 0;
 }
 
+.practice-credit {
+  width: min(100%, 720px);
+  margin: 38px auto 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-align: right;
+}
+
+.session-result .practice-credit {
+  margin-top: 46px;
+}
+
 .question-sheet > h1 {
   margin: 0 0 30px;
   color: var(--navy);

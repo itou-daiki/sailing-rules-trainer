@@ -104,6 +104,7 @@ export function PracticeSession({
           </button>
         </div>
         <p className="share-status" aria-live="polite">{shareStatus}</p>
+        <div className="practice-credit">Created by Dit-Lab.</div>
       </section>
     )
   }
@@ -238,6 +239,7 @@ export function PracticeSession({
           </div>
         ) : null}
       </div>
+      <div className="practice-credit">Created by Dit-Lab.</div>
     </section>
   )
 }

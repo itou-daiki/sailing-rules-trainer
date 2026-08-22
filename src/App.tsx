@@ -241,6 +241,7 @@ export default function App() {
               >
                 問題の改善を提案
               </a>
+              <span>Created by Dit-Lab.</span>
               <span>
                 内容確認：{RULESET.currentThrough}／{RULESET.checkedAt}
               </span>

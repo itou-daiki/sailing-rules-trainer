@@ -156,7 +156,10 @@ export default function App() {
             <MastMark compact />
             <span>
               <strong>セーリング・ルール練習帳</strong>
-              <small>{RULESET.edition}</small>
+              <span className="brand__meta">
+                <small className="brand__edition">{RULESET.edition}</small>
+                <small className="brand__credit">Created by Dit-Lab.</small>
+              </span>
             </span>
           </button>
           <nav className="desktop-nav" aria-label="メイン">

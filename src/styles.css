@@ -117,11 +117,20 @@ a {
 }
 
 .brand small {
-  margin-top: 4px;
   color: var(--muted);
   font-family: "SFMono-Regular", Consolas, monospace;
   font-size: 10px;
   letter-spacing: 0.12em;
+}
+
+.brand__meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.brand__credit {
+  letter-spacing: 0.06em;
 }
 
 .mast-mark {
@@ -1941,9 +1950,17 @@ a {
     font-size: 13px;
   }
 
-  .brand small,
+  .brand__edition,
   .desktop-nav {
     display: none;
+  }
+
+  .brand__meta {
+    margin-top: 2px;
+  }
+
+  .brand__credit {
+    font-size: 12px;
   }
 
   .main {

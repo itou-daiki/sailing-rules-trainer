@@ -10,11 +10,11 @@ export function RuleEvolution() {
     <section className="revision-dossier" id="rule-changes" aria-labelledby="revision-title">
       <header className="revision-dossier__header">
         <div>
-          <p className="eyebrow">EDITION LOG / WHAT CHANGED</p>
-          <h2 id="revision-title">ルールは、なぜ今の形になった？</h2>
+          <p className="eyebrow">FOR RETURNING SAILORS / 2025–2028</p>
+          <h2 id="revision-title">以前のルールを知っている人へ</h2>
           <p>
-            昔はクラブごとに違った規則が、国際的な共通ルールへ育ちました。
-            今回は2021–2024版から、艇上の判断に関係する変更を抜き出します。
+            初めて学ぶ人は、ここを今すぐ覚えなくても大丈夫です。
+            2021–2024版との違いを知りたいときだけ、項目を開いてください。
           </p>
         </div>
         <div className="revision-stamp" aria-label="現在の規則版">
@@ -24,15 +24,13 @@ export function RuleEvolution() {
         </div>
       </header>
 
-      <div className="rule-history" aria-labelledby="history-title">
-        <div className="revision-section-title">
-          <span>01</span>
-          <div>
-            <p>HISTORY</p>
-            <h3 id="history-title">クラブの約束から、世界の共通語へ</h3>
-          </div>
-        </div>
-        <ol>
+      <details className="rule-history">
+        <summary>
+          <span>HISTORY</span>
+          <strong id="history-title">ルールの歴史を4段階で見る</strong>
+          <small>クラブの約束から世界共通へ</small>
+        </summary>
+        <ol aria-labelledby="history-title">
           {ruleEras.map((era) => (
             <li key={era.id}>
               <time>{era.period}</time>
@@ -41,41 +39,38 @@ export function RuleEvolution() {
             </li>
           ))}
         </ol>
-      </div>
-
-      <div className="edition-cycle" aria-label="2025年から2028年までの現行規則の期間">
-        {['2025', '2026', '2027', '2028'].map((year, index) => (
-          <span className={index === 1 ? 'is-current' : ''} key={year}>
-            <small>{index === 0 ? 'START' : index === 3 ? 'END' : 'IN FORCE'}</small>
-            {year}
-          </span>
-        ))}
-      </div>
+        <div className="edition-cycle" aria-label="2025年から2028年までの現行規則の期間">
+          {['2025', '2026', '2027', '2028'].map((year, index) => (
+            <span className={index === 1 ? 'is-current' : ''} key={year}>
+              <small>{index === 0 ? 'START' : index === 3 ? 'END' : 'IN FORCE'}</small>
+              {year}
+            </span>
+          ))}
+        </div>
+      </details>
 
       <div className="change-log" aria-labelledby="changes-title">
-        <div className="revision-section-title">
-          <span>02</span>
+        <div className="revision-section-title revision-section-title--plain">
           <div>
             <p>2021–2024 → 2025–2028</p>
-            <h3 id="changes-title">今回、艇上で押さえたい6つの変更</h3>
+            <h3 id="changes-title">変更は6項目。題名を押すと詳しく読めます</h3>
           </div>
         </div>
 
-        <div className="change-log__labels" aria-hidden="true">
-          <span>REFERENCE</span>
-          <span>BEFORE / 以前</span>
-          <span>NOW / 今回</span>
-          <span>ON WATER / 艇上では</span>
-        </div>
-
         {ruleChanges.map((change, index) => (
-          <article className="change-entry" key={change.id}>
-            <div className="change-entry__reference">
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <strong>{change.reference}</strong>
-            </div>
+          <details className="change-entry" key={change.id}>
+            <summary>
+              <span className="change-entry__reference">
+                <small>{String(index + 1).padStart(2, '0')}</small>
+                <strong>{change.reference}</strong>
+              </span>
+              <span className="change-entry__summary">
+                <strong>{change.title}</strong>
+                <small>{change.quick}</small>
+              </span>
+              <span className="change-entry__open" aria-hidden="true">詳しく</span>
+            </summary>
             <div className="change-entry__content">
-              <h4>{change.title}</h4>
               <div className="change-entry__flow">
                 <div>
                   <h5>BEFORE <span>以前</span></h5>
@@ -91,14 +86,14 @@ export function RuleEvolution() {
                 </div>
               </div>
             </div>
-          </article>
+          </details>
         ))}
       </div>
 
       <aside className="revision-notice" aria-labelledby="revision-notice-title">
         <div>
-          <span>READ THIS FIRST</span>
-          <h3 id="revision-notice-title">この解説だけで、抗議を判断しない</h3>
+          <span>大会では</span>
+          <h3 id="revision-notice-title">公式の文書を優先</h3>
         </div>
         <p>
           ここでは学習用に短く言い換えています。現行版は{RULESET.edition}、
@@ -107,14 +102,12 @@ export function RuleEvolution() {
         </p>
       </aside>
 
-      <div className="revision-sources" aria-labelledby="sources-title">
-        <div className="revision-section-title">
-          <span>03</span>
-          <div>
-            <p>PRIMARY SOURCES</p>
-            <h3 id="sources-title">公式資料で確かめる</h3>
-          </div>
-        </div>
+      <details className="revision-sources">
+        <summary>
+          <span>PRIMARY SOURCES</span>
+          <strong id="sources-title">根拠にした公式資料</strong>
+          <small>5件</small>
+        </summary>
         <ul>
           {ruleEvolutionSources.map((source) => (
             <li key={source.id}>
@@ -126,7 +119,7 @@ export function RuleEvolution() {
             </li>
           ))}
         </ul>
-      </div>
+      </details>
     </section>
   )
 }

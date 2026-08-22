@@ -1,19 +1,36 @@
-import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { RuleLibrary } from './RuleLibrary'
 
+afterEach(cleanup)
+
 describe('ルール解説', () => {
-  it('ルール画面を離れずに変更点へ移動する', () => {
+  it('初心者ガイドと変更点へルール画面内で移動する', () => {
     render(<RuleLibrary onPractice={vi.fn()} />)
-    const section = document.getElementById('rule-changes')
-    const scrollIntoView = vi.fn()
+    const beginnerSection = document.getElementById('beginner-guide')
+    const changesSection = document.getElementById('rule-changes')
+    const beginnerScroll = vi.fn()
+    const changesScroll = vi.fn()
 
-    expect(section).not.toBeNull()
-    if (!section) return
-    section.scrollIntoView = scrollIntoView
+    expect(beginnerSection).not.toBeNull()
+    expect(changesSection).not.toBeNull()
+    if (!beginnerSection || !changesSection) return
+    beginnerSection.scrollIntoView = beginnerScroll
+    changesSection.scrollIntoView = changesScroll
 
-    fireEvent.click(screen.getByRole('button', { name: '2025–2028の変更を見る' }))
+    fireEvent.click(screen.getByRole('button', { name: '初心者ガイドから読む' }))
+    fireEvent.click(screen.getByRole('button', { name: '変更点だけを見る' }))
 
-    expect(scrollIntoView).toHaveBeenCalledOnce()
+    expect(beginnerScroll).toHaveBeenCalledOnce()
+    expect(changesScroll).toHaveBeenCalledOnce()
+  })
+
+  it('専門用語と詳しい条件を最初は閉じておく', () => {
+    render(<RuleLibrary onPractice={vi.fn()} />)
+
+    expect(screen.getByText('規則番号より先に、3つだけ見る')).toBeInTheDocument()
+    expect(screen.getByText('6つの用語をやさしく確認').closest('details')).not.toHaveAttribute('open')
+    expect(screen.getByText('反対タック').closest('details')).not.toHaveAttribute('open')
+    expect(screen.getByText('「自艇が当たらない」だけではない').closest('details')).not.toHaveAttribute('open')
   })
 })

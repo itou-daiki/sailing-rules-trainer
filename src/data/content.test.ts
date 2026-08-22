@@ -38,6 +38,7 @@ describe('教材データ', () => {
     expect(coveredSkills).toEqual(new Set(skillDefinitions.map((skill) => skill.id)))
     for (const rule of coreRules) {
       expect(formalReferences).toContain(`規則${rule.number}`)
+      expect(rule.example.trim()).not.toBe('')
     }
   })
 })

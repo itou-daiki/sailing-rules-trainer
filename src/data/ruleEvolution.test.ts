@@ -13,6 +13,7 @@ describe('規則の変遷と変更点データ', () => {
   it('各変更点に新旧比較と艇上の行動がある', () => {
     for (const change of ruleChanges) {
       expect(change.reference.trim()).not.toBe('')
+      expect(change.quick.trim()).not.toBe('')
       expect(change.before.trim()).not.toBe('')
       expect(change.now.trim()).not.toBe('')
       expect(change.onWater.trim()).not.toBe('')

@@ -61,6 +61,15 @@ const navItems: Array<{ id: Exclude<Page, 'practice'>; number: string; label: st
 
 const dailySession: SessionConfig = { label: '今日の5問', size: 5 }
 
+const courseBySkill: Record<SkillId, string> = {
+  'start-signals': 'start-line',
+  'course-signals': 'signal-watch',
+  'safety-signals': 'signal-watch',
+  'right-of-way': 'boats-meet',
+  'rule-limitations': 'right-with-limits',
+  'mark-room': 'mark-room',
+}
+
 const loadInitialProgress = (): LearningProgress => {
   try {
     return loadProgress(window.localStorage)
@@ -116,7 +125,7 @@ export default function App() {
     })
 
   const startDiagnostic = () =>
-    beginSession({ label: '5領域の現在地チェック', size: 5, diagnostic: true })
+    beginSession({ label: '6領域の現在地チェック', size: 6, diagnostic: true })
 
   const startCourse = (course: LearningCourse) =>
     beginSession({
@@ -127,7 +136,7 @@ export default function App() {
 
   const handleAnswer = (
     questionId: string,
-    result: { isCorrect: boolean; confidence: Confidence },
+    result: { isCorrect: boolean; confidence: Confidence; observationCorrect?: boolean },
   ) => {
     setProgress((current) => {
       const next = recordAnswer(current, questionId, result)
@@ -136,10 +145,19 @@ export default function App() {
     })
   }
 
-  const handleSessionComplete = (correct: number, total: number) => {
+  const handleSessionComplete = (correct: number, total: number, missedSkills: SkillId[]) => {
     if (!sessionConfig.diagnostic) return
     setProgress((current) => {
-      const next = completeDiagnostic(current, correct, total)
+      const recommendedCourseId = missedSkills[0]
+        ? courseBySkill[missedSkills[0]]
+        : 'race-ready'
+      const next = completeDiagnostic(
+        current,
+        correct,
+        total,
+        new Date(),
+        recommendedCourseId,
+      )
       saveProgress(next, window.localStorage)
       return next
     })
@@ -313,7 +331,7 @@ function HomePage({
               className="button button--signal"
               onClick={hasDiagnostic ? onStart : onDiagnostic}
             >
-              {hasDiagnostic ? '今日の5問を始める' : '5問で現在地を測る'}
+              {hasDiagnostic ? '今日の5問を始める' : '6問で現在地を測る'}
               <span aria-hidden="true">→</span>
             </button>
             <p>登録不要・記録はこの端末だけに保存</p>
@@ -369,7 +387,7 @@ function HomePage({
             <span className="mini-course" aria-hidden="true"><i>A</i><i>B</i></span>
             <span className="route-panel__body">
               <strong>基本ルール</strong>
-              <small>タック → 重なり → 優先関係</small>
+              <small>タック → 重なり → マーク回航</small>
             </span>
             <span className="route-panel__arrow" aria-hidden="true">→</span>
           </button>
@@ -428,7 +446,7 @@ function ProgressPage({ progress, stats, onStart }: ProgressPageProps) {
       </dl>
 
       <div className="progress-skills">
-        <h2>5領域の習熟度</h2>
+        <h2>6領域の習熟度</h2>
         <dl>
           {skillDefinitions.map((skill) => {
             const skillStat = skillStats.find((item) => item.id === skill.id)

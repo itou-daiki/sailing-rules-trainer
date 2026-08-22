@@ -74,6 +74,21 @@ describe('learningEngine', () => {
     expect(new Date(record?.dueAt ?? 0).getTime()).toBeGreaterThan(answeredAt.getTime())
   })
 
+  it('最終回答とは別に、判断材料を見抜けたか記録する', () => {
+    const progress = recordAnswer(
+      createEmptyProgress(),
+      'q-r10-port-starboard',
+      { isCorrect: true, confidence: 'sure', observationCorrect: false },
+      new Date('2026-08-22T01:00:00Z'),
+    )
+
+    expect(progress.answers['q-r10-port-starboard']).toMatchObject({
+      correct: 1,
+      observationAttempts: 1,
+      observationCorrect: 0,
+    })
+  })
+
   it('期限が来た問題と未回答問題を優先する', () => {
     let progress = createEmptyProgress()
     for (const question of quizQuestions.slice(0, 6)) {
@@ -95,14 +110,14 @@ describe('learningEngine', () => {
     expect(selected.some((question) => !progress.answers[question.id])).toBe(true)
   })
 
-  it('診断では5領域から1問ずつ選ぶ', () => {
+  it('診断では6領域から1問ずつ選ぶ', () => {
     const selected = selectPracticeQuestions(quizQuestions, createEmptyProgress(), {
-      size: 5,
+      size: 6,
       seed: 'diagnostic',
       diagnostic: true,
     })
 
-    expect(selected).toHaveLength(5)
+    expect(selected).toHaveLength(6)
     expect(new Set(selected.map((question) => question.skill)).size).toBe(skillDefinitions.length)
   })
 
@@ -120,6 +135,17 @@ describe('learningEngine', () => {
   it('診断結果から推奨コースを設定する', () => {
     const progress = completeDiagnostic(createEmptyProgress(), 2, 5, new Date('2026-08-22'))
     expect(progress.diagnostic?.recommendedCourseId).toBe('signal-watch')
+  })
+
+  it('診断で見落とした領域のコースを明示的に推奨できる', () => {
+    const progress = completeDiagnostic(
+      createEmptyProgress(),
+      5,
+      6,
+      new Date('2026-08-22'),
+      'mark-room',
+    )
+    expect(progress.diagnostic?.recommendedCourseId).toBe('mark-room')
   })
 
   it('ダッシュボードと領域別習熟度を集計する', () => {

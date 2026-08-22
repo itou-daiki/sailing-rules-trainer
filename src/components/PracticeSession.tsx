@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { QuizQuestion } from '../data/content'
+import type { QuizQuestion, SkillId } from '../data/content'
 import { getSignal } from '../data/content'
 import type { Confidence } from '../domain/learningEngine'
 import { FlagArtwork } from './FlagArtwork'
@@ -11,9 +11,9 @@ interface PracticeSessionProps {
   diagnostic?: boolean
   onAnswer: (
     questionId: string,
-    result: { isCorrect: boolean; confidence: Confidence },
+    result: { isCorrect: boolean; confidence: Confidence; observationCorrect?: boolean },
   ) => void
-  onComplete?: (correct: number, total: number) => void
+  onComplete?: (correct: number, total: number, missedSkills: SkillId[]) => void
   onFinish: () => void
   onRetry: () => void
 }
@@ -36,11 +36,15 @@ export function PracticeSession({
   const [questionIndex, setQuestionIndex] = useState(0)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [confidence, setConfidence] = useState<Confidence | null>(null)
+  const [observationIndex, setObservationIndex] = useState<number | null>(null)
+  const [observationCorrectCount, setObservationCorrectCount] = useState(0)
   const [correctCount, setCorrectCount] = useState(0)
+  const [missedSkills, setMissedSkills] = useState<SkillId[]>([])
   const [finished, setFinished] = useState(false)
   const [shareStatus, setShareStatus] = useState('')
 
   const question = questions[questionIndex]
+  const observationTotal = questions.filter((item) => item.observation).length
   if (!question) {
     return (
       <section className="empty-state">
@@ -53,7 +57,10 @@ export function PracticeSession({
   }
 
   const shareResult = async () => {
-    const resultText = `セーリング・ルール練習帳｜${sessionLabel} ${correctCount}/${questions.length}問正解`
+    const observationText = observationTotal > 0
+      ? `／見る力 ${observationCorrectCount}/${observationTotal}`
+      : ''
+    const resultText = `セーリング・ルール練習帳｜${sessionLabel} ${correctCount}/${questions.length}問正解${observationText}`
     const url = window.location.href.split('#')[0]
     try {
       if (navigator.share) {
@@ -83,9 +90,18 @@ export function PracticeSession({
         <div className="result-bar" aria-label={`正答率${percentage}%`}>
           <span style={{ width: `${percentage}%` }} />
         </div>
+        {observationTotal > 0 ? (
+          <div className="result-observation" aria-label={`判断材料の正答${observationCorrectCount}/${observationTotal}`}>
+            <span>見る力</span>
+            <strong>{observationCorrectCount} / {observationTotal}</strong>
+            <p>タック・重なり・動作の変化を、答える前に見抜けた数</p>
+          </div>
+        ) : null}
         <p>
           {diagnostic
             ? '結果に合わせて、最初に取り組むコースを選びました。'
+            : observationTotal > 0 && observationCorrectCount < observationTotal
+              ? '見落とした判断材料を記録し、次回の問題順へ反映しました。'
             : percentage === 100
               ? '全問正解です。次は、理由を言葉にしてから答えてみましょう。'
               : '間違いと確信度を記録し、次回の問題順を調整しました。'}
@@ -112,24 +128,46 @@ export function PracticeSession({
   const answered = confidence !== null
   const isCorrect = selectedIndex === question.correctIndex
   const flag = question.flagId ? getSignal(question.flagId) : undefined
+  const observation = question.observation
 
   const submitConfidence = (value: Confidence) => {
     if (selectedIndex === null || answered) return
     const correct = selectedIndex === question.correctIndex
+    const observedCorrect = !observation || observationIndex === observation.correctIndex
     setConfidence(value)
     if (correct) setCorrectCount((count) => count + 1)
-    onAnswer(question.id, { isCorrect: correct, confidence: value })
+    if (!correct || !observedCorrect) {
+      setMissedSkills((skills) =>
+        skills.includes(question.skill) ? skills : [...skills, question.skill],
+      )
+    }
+    onAnswer(question.id, {
+      isCorrect: correct,
+      confidence: value,
+      ...(observation
+        ? { observationCorrect: observedCorrect }
+        : {}),
+    })
+  }
+
+  const selectObservation = (choiceIndex: number) => {
+    if (!observation || observationIndex !== null) return
+    setObservationIndex(choiceIndex)
+    if (choiceIndex === observation.correctIndex) {
+      setObservationCorrectCount((count) => count + 1)
+    }
   }
 
   const moveNext = () => {
     if (questionIndex === questions.length - 1) {
-      onComplete?.(correctCount, questions.length)
+      onComplete?.(correctCount, questions.length, missedSkills)
       setFinished(true)
       return
     }
     setQuestionIndex((index) => index + 1)
     setSelectedIndex(null)
     setConfidence(null)
+    setObservationIndex(null)
   }
 
   const selectedFeedback =
@@ -165,30 +203,80 @@ export function PracticeSession({
           <p className="eyebrow">{question.category === 'signal' ? 'SIGNAL' : 'SITUATION'}</p>
           <span>難度 {question.difficulty}</span>
         </div>
+        <h1 id="question-title">{question.prompt}</h1>
         {flag ? <FlagArtwork kind={flag.artwork} label={flag.name} /> : null}
         {question.diagram ? <ScenarioBoard diagram={question.diagram} /> : null}
-        <h1 id="question-title">{question.prompt}</h1>
 
-        <div className="answer-list" role="group" aria-label="選択肢">
-          {question.choices.map((choice, choiceIndex) => {
-            const correctChoice = answered && choiceIndex === question.correctIndex
-            const wrongChoice = answered && choiceIndex === selectedIndex && !correctChoice
-            const selectedChoice = !answered && choiceIndex === selectedIndex
-            return (
-              <button
-                type="button"
-                key={choice}
-                className={`answer-choice${selectedChoice ? ' is-selected' : ''}${correctChoice ? ' is-correct' : ''}${wrongChoice ? ' is-wrong' : ''}`}
-                onClick={() => setSelectedIndex(choiceIndex)}
-                disabled={answered}
-                aria-pressed={selectedChoice}
-              >
-                <span>{String.fromCharCode(65 + choiceIndex)}</span>
-                {choice}
-              </button>
-            )
-          })}
-        </div>
+        {observation ? (
+          <section className={`observation-check${observationIndex !== null ? ' is-resolved' : ''}`} aria-labelledby="observation-title">
+            <header>
+              <span>STEP 1</span>
+              <strong id="observation-title">見る</strong>
+              <small>答えを決める前に、状況を分類</small>
+            </header>
+            <p>{observation.prompt}</p>
+            <div role="group" aria-label="判断材料の選択肢">
+              {observation.choices.map((choice, choiceIndex) => {
+                const selected = observationIndex === choiceIndex
+                const correct = observationIndex !== null && choiceIndex === observation.correctIndex
+                const wrong = selected && choiceIndex !== observation.correctIndex
+                return (
+                  <button
+                    type="button"
+                    key={choice}
+                    className={`${selected ? 'is-selected' : ''}${correct ? ' is-correct' : ''}${wrong ? ' is-wrong' : ''}`}
+                    onClick={() => selectObservation(choiceIndex)}
+                    disabled={observationIndex !== null}
+                    aria-pressed={selected}
+                  >
+                    <span>{String(choiceIndex + 1).padStart(2, '0')}</span>
+                    {choice}
+                  </button>
+                )
+              })}
+            </div>
+            {observationIndex !== null ? (
+              <div className={`observation-check__feedback${observationIndex === observation.correctIndex ? ' is-correct' : ' is-wrong'}`} aria-live="polite">
+                <strong>{observationIndex === observation.correctIndex ? '判断材料を見抜けた' : '見る場所を修正'}</strong>
+                <p>{observation.feedback[observationIndex]}</p>
+              </div>
+            ) : null}
+          </section>
+        ) : null}
+
+        {!observation || observationIndex !== null ? (
+          <section className={`decision-step${observation ? ' decision-step--second' : ''}`} aria-labelledby={observation ? 'decision-step-title' : undefined}>
+            {observation ? (
+              <header>
+                <span>STEP 2</span>
+                <strong id="decision-step-title">決める</strong>
+                <small>確認した材料から、結論を選ぶ</small>
+              </header>
+            ) : null}
+            <div className="answer-list" role="group" aria-label="選択肢">
+              {question.choices.map((choice, choiceIndex) => {
+                const correctChoice = answered && choiceIndex === question.correctIndex
+                const wrongChoice = answered && choiceIndex === selectedIndex && !correctChoice
+                const selectedChoice = !answered && choiceIndex === selectedIndex
+                return (
+                  <button
+                    type="button"
+                    key={choice}
+                    className={`answer-choice${selectedChoice ? ' is-selected' : ''}${correctChoice ? ' is-correct' : ''}${wrongChoice ? ' is-wrong' : ''}`}
+                    onClick={() => setSelectedIndex(choiceIndex)}
+                    disabled={answered}
+                    aria-pressed={selectedChoice}
+                  >
+                    <span>{String.fromCharCode(65 + choiceIndex)}</span>
+                    {choice}
+                  </button>
+                )
+              })}
+            </div>
+          </section>
+        ) : (
+          <p className="decision-step__waiting">まずSTEP 1で、図から判断材料を選びます。</p>
+        )}
 
         {selectedIndex !== null && !answered ? (
           <fieldset className="confidence-check">

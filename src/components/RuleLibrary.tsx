@@ -19,7 +19,13 @@ const ruleGroups = [
     label: '慣れてから',
     title: '追いついた風下艇の制限',
     description: '規則17。成立条件が多いので、最初は結論だけで大丈夫です。',
-    rules: coreRules.slice(7),
+    rules: coreRules.slice(7, 8),
+  },
+  {
+    label: 'マークで使う',
+    title: 'ゾーンへ入る瞬間を止めて見る',
+    description: '規則18。重なり、内側・外側、タックの順に整理します。',
+    rules: coreRules.slice(8),
   },
 ]
 

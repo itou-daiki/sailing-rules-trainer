@@ -75,7 +75,7 @@ export interface ScenarioDiagram {
   windDirection: 'north' | 'south' | 'east' | 'west'
   boats: BoatPosition[]
   overlap?: boolean
-  mark?: { x: number; y: number }
+  mark?: { x: number; y: number; zone?: boolean }
   path?: { boat: 'A' | 'B'; d: string }
 }
 
@@ -87,6 +87,14 @@ export type SkillId =
   | 'safety-signals'
   | 'right-of-way'
   | 'rule-limitations'
+  | 'mark-room'
+
+export interface ObservationCheck {
+  prompt: string
+  choices: string[]
+  correctIndex: number
+  feedback: string[]
+}
 
 export interface SkillDefinition {
   id: SkillId
@@ -107,6 +115,7 @@ export interface QuizQuestion {
   points: string[]
   formal: string
   choiceFeedback?: string[]
+  observation?: ObservationCheck
   flagId?: string
   diagram?: ScenarioDiagram
 }
@@ -142,12 +151,18 @@ export const skillDefinitions: SkillDefinition[] = [
     name: '航路権艇の制限',
     description: '接触回避、航路権の取得、進路変更の限界を判断する。',
   },
+  {
+    id: 'mark-room',
+    shortName: 'マーク',
+    name: 'マークルーム',
+    description: 'ゾーンへ入る瞬間の重なりと内側・外側から、回航の余地を判断する。',
+  },
 ]
 
 export const RULESET = {
   edition: 'RRS 2025–2028',
   currentThrough: 'JSAF正誤表-5（2026年5月30日）',
-  checkedAt: '2026年8月22日',
+  checkedAt: '2026年8月23日',
   officialUrl: 'https://www.sailing.org/racingrules/',
   jsafUrl: 'https://www.jsaf.or.jp/hp/about/committee/rule/rule-reg',
 } as const
@@ -584,6 +599,15 @@ export const coreRules: CoreRule[] = [
     lookFor: ['後ろからオーバーラップしたか', '2艇身以内だったか', 'オーバーラップが続いているか'],
     caution: '成立条件が多い。単に「風下艇はラフできない」と覚えない。',
   },
+  {
+    id: 'r18',
+    number: '18',
+    title: 'マークルーム',
+    takeaway: 'ゾーンへ入る瞬間を見て、内側艇や先に入った艇へマークを回る余地を与える。',
+    example: '同じタックで横に重なったまま一方がゾーンへ入ったら、外側艇が内側艇へ回航する場所を残す。',
+    lookFor: ['どちらかが3艇身のゾーンへ入った瞬間', 'その瞬間に重なっていたか', '内側・外側のどちらか'],
+    caution: '「内側なら必ず優先」と覚えない。反対タックやゾーン内のタックなど、規則18を使わない場面や追加制限がある。',
+  },
 ]
 
 const signalQuestion = (
@@ -890,6 +914,16 @@ export const quizQuestions: QuizQuestion[] = [
     conclusion: 'ポートタックのA艇が、スターボードタックのB艇を避けます。',
     points: ['まずタックを判定する', '右・左から来る見た目では決めない'],
     formal: '規則10 反対タックの場合',
+    observation: {
+      prompt: '規則を選ぶ前に、2艇の関係をどう分類する？',
+      choices: ['反対タック', '同一タックでオーバーラップ', '同一タックで前後'],
+      correctIndex: 0,
+      feedback: [
+        'A艇とB艇は異なるタックです。まず規則10から考えます。',
+        '横に見えても、先にタックが同じか違うかを確認します。',
+        '前後関係より先に、2艇のタックが異なることを押さえます。',
+      ],
+    },
     diagram: {
       windDirection: 'north',
       boats: [
@@ -909,6 +943,16 @@ export const quizQuestions: QuizQuestion[] = [
     conclusion: '風上側のA艇が、風下側のB艇を避けます。',
     points: ['同一タックか確認', 'オーバーラップと風上・風下を確認'],
     formal: '規則11 同一タックでオーバーラップしている場合',
+    observation: {
+      prompt: 'この場面で、規則を分ける2つの材料は？',
+      choices: ['同一タック＋オーバーラップ', '反対タック＋衝突コース', '同一タック＋前後に完全に分離'],
+      correctIndex: 0,
+      feedback: [
+        '同じタックで横に重なっています。次に風上・風下を見ます。',
+        '両艇は同じタックです。反対タックの規則10ではありません。',
+        '横方向に重なっているため、規則12の前後関係ではありません。',
+      ],
+    },
     diagram: {
       windDirection: 'north',
       overlap: true,
@@ -929,6 +973,16 @@ export const quizQuestions: QuizQuestion[] = [
     conclusion: 'クリア・アスターンのA艇が、前のB艇を避けます。',
     points: ['艇と通常位置にある装備の後端を見る', '重なった時点で規則11などに切り替わる'],
     formal: '規則12 同一タックでオーバーラップしていない場合',
+    observation: {
+      prompt: 'A艇とB艇の位置関係をどう読む？',
+      choices: ['同一タックで前後', '同一タックでオーバーラップ', 'A艇がタッキング中'],
+      correctIndex: 0,
+      feedback: [
+        'A艇はB艇の装備を含む後端より完全に後ろです。規則12を考えます。',
+        '2艇は横に重ならず、完全な前後関係です。',
+        'A艇は直進中です。タッキング中を示す動きはありません。',
+      ],
+    },
     diagram: {
       windDirection: 'north',
       boats: [
@@ -948,6 +1002,16 @@ export const quizQuestions: QuizQuestion[] = [
     conclusion: 'タッキング中のA艇が他艇を避けます。',
     points: ['風位を越えた瞬間から規則13', '新しいタックのクローズホールドまで続く'],
     formal: '規則13 タッキング中',
+    observation: {
+      prompt: 'A艇の動作は、いまどの段階？',
+      choices: ['風位を越え、まだタック完了前', '新しいタックで直進済み', 'まだ風位を越える前'],
+      correctIndex: 0,
+      feedback: [
+        '風位を越えてからクローズホールドになるまで、A艇はタッキング中です。',
+        'まだ新しいタックのクローズホールドにはなっていません。',
+        'すでに風位を越えています。ここから規則13が適用されます。',
+      ],
+    },
     diagram: {
       windDirection: 'north',
       boats: [
@@ -968,6 +1032,16 @@ export const quizQuestions: QuizQuestion[] = [
     conclusion: '航路権艇でも、合理的に可能なら接触を避けます。',
     points: ['航路権は接触してよい権利ではない', '相手が避けていないと明らかになった時点を見る'],
     formal: '規則14 接触の回避',
+    observation: {
+      prompt: '航路権以外に、いま確認すべき事実は？',
+      choices: ['A艇はまだ接触を避けられる', 'A艇は航路権を失った', 'B艇はすでに十分避けている'],
+      correctIndex: 0,
+      feedback: [
+        '合理的に接触を避けられる段階なので、規則14も見ます。',
+        'A艇の航路権は消えていません。ただし接触回避義務があります。',
+        'B艇が避けていないことが明らかな場面です。',
+      ],
+    },
     diagram: {
       windDirection: 'north',
       boats: [
@@ -987,6 +1061,16 @@ export const quizQuestions: QuizQuestion[] = [
     conclusion: '新たに航路権を得たA艇は、最初にB艇へ避ける余地を与えます。',
     points: ['航路権が切り替わった瞬間を見る', '相手が対応できる時間と空間を考える'],
     formal: '規則15 航路権を得る場合',
+    observation: {
+      prompt: '航路権が変わったきっかけは？',
+      choices: ['A艇自身の動作', 'B艇自身の動作', '航路権は変わっていない'],
+      correctIndex: 0,
+      feedback: [
+        'A艇の動作で新しく航路権を得たため、最初の余地を考えます。',
+        'この場面では、B艇ではなくA艇の動作がきっかけです。',
+        'A艇が新しく航路権を得た瞬間が示されています。',
+      ],
+    },
     diagram: {
       windDirection: 'north',
       overlap: true,
@@ -1007,6 +1091,16 @@ export const quizQuestions: QuizQuestion[] = [
     conclusion: '進路変更しても、相手艇に避ける余地を与えます。',
     points: ['航路権艇の進路変化を見る', '避ける艇の逃げ道が残っているか'],
     formal: '規則16 航路変更',
+    observation: {
+      prompt: '図で変化しているのは何？',
+      choices: ['航路権艇Aの進路', '避ける艇Bのタック', '両艇のタック'],
+      correctIndex: 0,
+      feedback: [
+        '曲線は航路権艇Aの進路変更です。B艇の逃げ道を確認します。',
+        'B艇はタックしていません。変化しているのはA艇の進路です。',
+        '両艇のタックではなく、A艇の進路が変化しています。',
+      ],
+    },
     diagram: {
       windDirection: 'north',
       boats: [
@@ -1027,12 +1121,208 @@ export const quizQuestions: QuizQuestion[] = [
     conclusion: '条件が続く間、風下のB艇はプロパー・コースより風上を帆走しません。',
     points: ['後ろから重なったか', '2艇身以内か', '同じタックで重なりが続くか'],
     formal: '規則17 同一タックでのプロパー・コース',
+    observation: {
+      prompt: '規則17につながる成立条件はどれ？',
+      choices: ['B艇が後ろから2艇身以内で風下に重なった', 'A艇が後ろから追いついた', '2艇は反対タックで接近した'],
+      correctIndex: 0,
+      feedback: [
+        '後ろから、2艇身以内で、風下に重なったという3点を押さえます。',
+        '後ろから重なったのはB艇です。艇を取り違えないようにします。',
+        '2艇は同一タックです。反対タックの場面ではありません。',
+      ],
+    },
     diagram: {
       windDirection: 'north',
       overlap: true,
       boats: [
         { id: 'A', label: '風上', x: 44, y: 38, heading: 0, tack: 'starboard' },
         { id: 'B', label: '風下・後方から', x: 61, y: 56, heading: 0, tack: 'starboard' },
+      ],
+    },
+  },
+  // Source: World Sailing, RRS 2025–2028, rule 18 and definition Mark-Room.
+  // https://media.sailing.org/sailing/wp-content/uploads/2025/07/29083752/2025-2028-RRS-with-Changes-and-Corrections.pdf
+  {
+    id: 'q-r18-first-zone-clear',
+    category: 'rule',
+    skill: 'mark-room',
+    difficulty: 1,
+    prompt: 'A艇がB艇より先にゾーンへ入りました。2艇は重なっていません。マークルームを与えるのは？',
+    choices: ['後からゾーンへ入るB艇', '先にゾーンへ入ったA艇', 'マークに近い運営艇'],
+    correctIndex: 0,
+    conclusion: '重なりがないときは、まだゾーンへ入っていないB艇が、先に入ったA艇へマークルームを与えます。',
+    points: ['どちらかがゾーンへ入った瞬間を止めて見る', 'その瞬間に2艇が重なっていないことを確認する'],
+    formal: '規則18.2(a) マークルームを与えること',
+    observation: {
+      prompt: 'A艇がゾーンへ入った瞬間、2艇の関係は？',
+      choices: ['A艇が先・重なりなし', '横に重なり、A艇が外側', '反対タックで向かい合う'],
+      correctIndex: 0,
+      feedback: [
+        '先に入った艇と、その瞬間の重なりを正しく見抜けました。',
+        '2艇は横に重なっていません。まず前後関係を見ます。',
+        '2艇は同じタックです。反対タックの例外ではありません。',
+      ],
+    },
+    diagram: {
+      windDirection: 'north',
+      mark: { x: 50, y: 34, zone: true },
+      boats: [
+        { id: 'A', label: '先にゾーンへ', x: 50, y: 60, heading: 0, tack: 'starboard' },
+        { id: 'B', label: '後ろ', x: 50, y: 83, heading: 0, tack: 'starboard' },
+      ],
+    },
+  },
+  {
+    id: 'q-r18-inside-overlap',
+    category: 'rule',
+    skill: 'mark-room',
+    difficulty: 1,
+    prompt: '重なった2艇がゾーンへ入りました。A艇が内側、B艇が外側です。マークルームを与えるのは？',
+    choices: ['外側のB艇', '内側のA艇', '先に声を出した艇'],
+    correctIndex: 0,
+    conclusion: 'ゾーンへ入る瞬間に重なっていれば、外側のB艇が内側のA艇へマークルームを与えます。',
+    points: ['ゾーンへ入る瞬間の重なりを見る', 'マークに近い内側艇と、外側艇を見分ける'],
+    formal: '規則18.2(a) マークルームを与えること',
+    observation: {
+      prompt: 'ゾーンへ入る瞬間の位置関係は？',
+      choices: ['重なりあり・A艇が内側', '重なりなし・B艇が前', 'A艇がゾーンを出た後'],
+      correctIndex: 0,
+      feedback: [
+        '重なりと内外の2点を正しく分類できました。',
+        '横に並んでいるため、重なりがあります。',
+        'いま見ているのはゾーンへ入る瞬間です。',
+      ],
+    },
+    diagram: {
+      windDirection: 'north',
+      overlap: true,
+      mark: { x: 66, y: 34, zone: true },
+      boats: [
+        { id: 'A', label: '内側', x: 60, y: 59, heading: 0, tack: 'starboard' },
+        { id: 'B', label: '外側', x: 38, y: 63, heading: 0, tack: 'starboard' },
+      ],
+    },
+  },
+  {
+    id: 'q-r18-overlap-changes',
+    category: 'rule',
+    skill: 'mark-room',
+    difficulty: 2,
+    prompt: 'ゾーンへ入った瞬間はA艇が内側で重なっていました。その後、重なりがなくなりました。B艇の義務は？',
+    choices: ['A艇へマークルームを与え続ける', '重なりが消えた瞬間に終わる', 'A艇をマークの外へ押し出す'],
+    correctIndex: 0,
+    conclusion: 'ゾーンへ入った瞬間に決まったマークルームの義務は、後で重なりが変わっても続きます。',
+    points: ['判定する瞬間は最初の艇がゾーンへ入ったとき', 'その後の重なりだけで権利関係をリセットしない'],
+    formal: '規則18.2(a) マークルームを与えること',
+    observation: {
+      prompt: 'この問題で固定して覚える「判定の瞬間」は？',
+      choices: ['最初の艇がゾーンへ入った瞬間', '重なりが消えた瞬間', '先頭艇がフィニッシュした瞬間'],
+      correctIndex: 0,
+      feedback: [
+        '最初にゾーンへ入った瞬間の関係を基準にします。',
+        '後の変化ではなく、ゾーンへ入った瞬間へ戻って判断します。',
+        'フィニッシュは、この場面のマークルーム判定と関係しません。',
+      ],
+    },
+    diagram: {
+      windDirection: 'north',
+      mark: { x: 66, y: 34, zone: true },
+      path: { boat: 'B', d: 'M 37 82 Q 41 61 49 45' },
+      boats: [
+        { id: 'A', label: '内側・権利あり', x: 59, y: 59, heading: 0, tack: 'starboard' },
+        { id: 'B', label: '外側', x: 37, y: 77, heading: 0, tack: 'starboard' },
+      ],
+    },
+  },
+  {
+    id: 'q-r18-opposite-tacks-beat',
+    category: 'rule',
+    skill: 'mark-room',
+    difficulty: 2,
+    prompt: '風上マークへ向かうビートで、A艇はポート、B艇はスターボードです。規則18より先に使うのは？',
+    choices: ['規則10。ポート艇Aが避ける', '規則18。内側艇が必ず優先', 'どちらも同じ権利'],
+    correctIndex: 0,
+    conclusion: 'ビートで反対タックの2艇には規則18を適用せず、規則10でポート艇が避けます。',
+    points: ['反対タックかを最初に見る', '風上へ向かうビートでは規則18の適用外になる'],
+    formal: '規則18.1(a) 規則18を適用する場合／規則10',
+    observation: {
+      prompt: 'マークの内外より先に、何を確認する？',
+      choices: ['ビートで2艇が反対タック', 'A艇がマークに少し近い', 'どちらが先に声を出したか'],
+      correctIndex: 0,
+      feedback: [
+        '反対タックかつビートという、規則18の例外を見抜けました。',
+        'マークへの近さだけでは決めません。先にタックと帆走状態を見ます。',
+        '声の順番では権利は決まりません。',
+      ],
+    },
+    diagram: {
+      windDirection: 'north',
+      mark: { x: 50, y: 34, zone: true },
+      boats: [
+        { id: 'A', label: 'ポート', x: 28, y: 67, heading: 38, tack: 'port' },
+        { id: 'B', label: 'スターボード', x: 72, y: 67, heading: -38, tack: 'starboard' },
+      ],
+    },
+  },
+  {
+    id: 'q-r18-tack-in-zone',
+    category: 'rule',
+    skill: 'mark-room',
+    difficulty: 3,
+    prompt: 'ポート回りの風上マーク。A艇がゾーン内でポートからスターボードへタックし、スターボードで入ったB艇の前へ出ました。A艇は？',
+    choices: ['B艇をクローズホールドより上へ押し上げず、必要ならマークルームを与える', 'タック完了と同時に自由にラフできる', '内側なら必ずB艇を押し出せる'],
+    correctIndex: 0,
+    conclusion: 'ゾーン内でタックしたA艇には、B艇を押し上げないことと、条件がそろえばマークルームを与える制限があります。',
+    points: ['A艇がどこでポートからスターボードへタックしたか', 'B艇がスターボードでゾーンへ入ったか'],
+    formal: '規則18.3 ゾーン内で風位を越える場合',
+    observation: {
+      prompt: '通常の内側・外側だけで決められない理由は？',
+      choices: ['A艇がゾーン内でポートからスターボードへタックした', 'B艇の方が艇速が高い', '2艇ともゾーンの外にいる'],
+      correctIndex: 0,
+      feedback: [
+        'ゾーン内のタックを見抜けました。規則18.3の追加制限を確認します。',
+        '艇速ではなく、ゾーン内でのタックが分岐です。',
+        '2艇はゾーン内にいます。位置をもう一度確認します。',
+      ],
+    },
+    diagram: {
+      windDirection: 'north',
+      mark: { x: 50, y: 34, zone: true },
+      path: { boat: 'A', d: 'M 20 83 Q 34 65 49 59' },
+      boats: [
+        { id: 'A', label: 'ゾーン内でタック', x: 46, y: 59, heading: -18, tack: 'starboard' },
+        { id: 'B', label: 'スターボードで進入', x: 72, y: 69, heading: -34, tack: 'starboard' },
+      ],
+    },
+  },
+  {
+    id: 'q-r18-room-given',
+    category: 'rule',
+    skill: 'mark-room',
+    difficulty: 2,
+    prompt: 'A艇へ必要なマークルームが与えられ、A艇はマークを回り終えました。2艇間の規則18は？',
+    choices: ['適用が終わり、次の位置関係を判断する', 'フィニッシュまで続く', '次のマークまでA艇が必ず優先'],
+    correctIndex: 0,
+    conclusion: '必要なマークルームが与えられたら規則18は終わり、現在のタック・重なり・動きから判断し直します。',
+    points: ['マークルームを与え終えたかを見る', '古い権利関係を次のレグまで引きずらない'],
+    formal: '規則18.1 規則18を適用する場合',
+    observation: {
+      prompt: '規則18が終わる材料はどれ？',
+      choices: ['必要なマークルームをすでに与えた', 'まだ最初の艇がゾーンへ入っていない', 'スタート信号が鳴った'],
+      correctIndex: 0,
+      feedback: [
+        'マークルームを与え終えた時点を正しく捉えました。',
+        'すでに回航まで終えています。時間の順序を確認します。',
+        'スタート信号ではなく、マークルームを与えたかが分岐です。',
+      ],
+    },
+    diagram: {
+      windDirection: 'north',
+      mark: { x: 50, y: 45, zone: true },
+      path: { boat: 'A', d: 'M 25 68 Q 38 36 70 39' },
+      boats: [
+        { id: 'A', label: '回航済み', x: 72, y: 37, heading: 78, tack: 'starboard' },
+        { id: 'B', label: '外側艇', x: 68, y: 68, heading: 45, tack: 'starboard' },
       ],
     },
   },

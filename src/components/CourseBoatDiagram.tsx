@@ -111,6 +111,19 @@ const RoomScene = ({ arrowId }: { arrowId: string }) => (
   </>
 )
 
+const MarkScene = ({ arrowId }: { arrowId: string }) => (
+  <>
+    <Wind />
+    <circle cx="111" cy="43" r="48" className="course-boat-art__zone" />
+    <text x="61" y="18" className="course-boat-art__callout">3艇身ゾーン</text>
+    <CourseMark x={111} y={43} />
+    <path d="M75 135 C76 102 88 79 105 57" markerEnd={`url(#${arrowId})`} className="course-boat-art__route" />
+    <path d="M143 135 C142 104 132 79 118 59" markerEnd={`url(#${arrowId})`} className="course-boat-art__route is-muted" />
+    <Boat x={86} y={99} heading={12} scale={0.65} tack="starboard" label="内側" />
+    <Boat x={141} y={105} heading={-12} scale={0.65} tack="starboard" label="外側" />
+  </>
+)
+
 const RaceScene = ({ arrowId }: { arrowId: string }) => (
   <>
     <Wind />
@@ -129,6 +142,7 @@ const scenes: Record<CourseArtworkKind, (arrowId: string) => ReactNode> = {
   start: (arrowId) => <StartScene arrowId={arrowId} />,
   meeting: (arrowId) => <MeetingScene arrowId={arrowId} />,
   room: (arrowId) => <RoomScene arrowId={arrowId} />,
+  mark: (arrowId) => <MarkScene arrowId={arrowId} />,
   race: (arrowId) => <RaceScene arrowId={arrowId} />,
 }
 

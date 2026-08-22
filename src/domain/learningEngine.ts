@@ -18,6 +18,8 @@ export interface AnswerRecord {
   dueAt: string
   confidenceCounts: Record<Confidence, number>
   highConfidenceErrors: number
+  observationAttempts?: number
+  observationCorrect?: number
 }
 
 export interface DiagnosticResult {
@@ -57,6 +59,7 @@ type AnswerInput =
   | {
       isCorrect: boolean
       confidence?: Confidence
+      observationCorrect?: boolean
     }
 
 interface LegacyAnswerRecord {
@@ -105,7 +108,10 @@ const isAnswerRecord = (value: unknown): value is AnswerRecord => {
     typeof record.lastAnswered === 'string' &&
     typeof record.dueAt === 'string' &&
     isConfidenceCounts(record.confidenceCounts) &&
-    isCount(record.highConfidenceErrors)
+    isCount(record.highConfidenceErrors) &&
+    (record.observationAttempts === undefined || isCount(record.observationAttempts)) &&
+    (record.observationCorrect === undefined || isCount(record.observationCorrect)) &&
+    Number(record.observationCorrect ?? 0) <= Number(record.observationAttempts ?? 0)
   )
 }
 
@@ -222,8 +228,10 @@ export const recordAnswer = (
   input: AnswerInput,
   answeredAt = new Date(),
 ): LearningProgress => {
-  const { isCorrect, confidence = 'unsure' } =
-    typeof input === 'boolean' ? { isCorrect: input, confidence: 'unsure' as const } : input
+  const { isCorrect, confidence = 'unsure', observationCorrect } =
+    typeof input === 'boolean'
+      ? { isCorrect: input, confidence: 'unsure' as const, observationCorrect: undefined }
+      : input
   const previous = progress.answers[questionId] ?? {
     attempts: 0,
     correct: 0,
@@ -232,6 +240,8 @@ export const recordAnswer = (
     dueAt: answeredAt.toISOString(),
     confidenceCounts: { sure: 0, unsure: 0, guess: 0 },
     highConfidenceErrors: 0,
+    observationAttempts: 0,
+    observationCorrect: 0,
   }
   const correctStreak = isCorrect ? previous.correctStreak + 1 : 0
   const intervalByStreak = [0, 1, 3, 7, 14, 30]
@@ -258,6 +268,10 @@ export const recordAnswer = (
         },
         highConfidenceErrors:
           previous.highConfidenceErrors + (!isCorrect && confidence === 'sure' ? 1 : 0),
+        observationAttempts:
+          (previous.observationAttempts ?? 0) + (observationCorrect === undefined ? 0 : 1),
+        observationCorrect:
+          (previous.observationCorrect ?? 0) + (observationCorrect === true ? 1 : 0),
       },
     },
     studyDays: [...new Set([...progress.studyDays, today])].sort(),
@@ -270,6 +284,7 @@ export const completeDiagnostic = (
   score: number,
   total: number,
   completedAt = new Date(),
+  recommendedCourseId?: string,
 ): LearningProgress => ({
   ...progress,
   diagnostic: {
@@ -277,11 +292,11 @@ export const completeDiagnostic = (
     score,
     total,
     recommendedCourseId:
-      score <= Math.floor(total * 0.4)
+      recommendedCourseId ?? (score <= Math.floor(total * 0.4)
         ? 'signal-watch'
         : score < Math.ceil(total * 0.8)
           ? 'boats-meet'
-          : 'race-ready',
+          : 'race-ready'),
   },
 })
 
@@ -307,8 +322,12 @@ const weaknessScore = (
   const accuracy = record.correct / record.attempts
   const due = new Date(record.dueAt).getTime() <= now.getTime()
   const confidencePenalty = record.highConfidenceErrors * 40
+  const observationAttempts = record.observationAttempts ?? 0
+  const observationAccuracy =
+    observationAttempts === 0 ? 1 : (record.observationCorrect ?? 0) / observationAttempts
+  const observationPenalty = (1 - observationAccuracy) * 70
   const mastery = accuracy * 100 + Math.min(record.correctStreak, 4) * 24
-  return (due ? -10_000 : 0) + mastery - confidencePenalty + tieBreak
+  return (due ? -10_000 : 0) + mastery - confidencePenalty - observationPenalty + tieBreak
 }
 
 const rankQuestions = (

@@ -1,6 +1,6 @@
 import type { SkillId } from './content'
 
-export type CourseArtworkKind = 'signals' | 'start' | 'meeting' | 'room' | 'race'
+export type CourseArtworkKind = 'signals' | 'start' | 'meeting' | 'room' | 'mark' | 'race'
 
 export interface LearningCourse {
   id: string
@@ -65,8 +65,20 @@ export const learningCourses: LearningCourse[] = [
     questionCount: 5,
   },
   {
-    id: 'race-ready',
+    id: 'mark-room',
     order: 5,
+    code: 'WATER 03',
+    title: 'マークを回る',
+    shortDescription: '3艇身ゾーン、内側・外側、ゾーン内のタック',
+    outcome: '規則18を使う場面と、マークルームを与える艇を判断できる。',
+    artwork: 'mark',
+    artworkCaption: 'ゾーンへ入る瞬間 → 重なりと内外を見る',
+    skills: ['mark-room'],
+    questionCount: 6,
+  },
+  {
+    id: 'race-ready',
+    order: 6,
     code: 'RACE CHECK',
     title: 'レース前チェック',
     shortDescription: '信号旗と規則を混ぜた実戦確認',
@@ -79,6 +91,7 @@ export const learningCourses: LearningCourse[] = [
       'safety-signals',
       'right-of-way',
       'rule-limitations',
+      'mark-room',
     ],
     questionCount: 8,
   },

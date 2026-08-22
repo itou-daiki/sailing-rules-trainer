@@ -34,13 +34,13 @@ export function LearningPath({
       <div className="section-heading section-heading--split">
         <div>
           <p className="eyebrow">TRAINING COURSE</p>
-          <h1 id="course-title">迷わず進める、5つの練習</h1>
+          <h1 id="course-title">迷わず進める、6つの練習</h1>
           <p className="lead">
             暗記の順ではなく、艇上で判断する順に並べています。各コースは5分前後です。
           </p>
         </div>
         <button type="button" className="button button--ink" onClick={onDiagnostic}>
-          {progress.diagnostic ? '現在地を測り直す' : '5問で現在地を測る'}
+          {progress.diagnostic ? '現在地を測り直す' : '6問で現在地を測る'}
         </button>
       </div>
 
@@ -54,7 +54,7 @@ export function LearningPath({
       ) : (
         <div className="diagnostic-note diagnostic-note--open">
           <span>FIRST STEP</span>
-          <p>最初に5領域を1問ずつ解くと、今の理解に合うスタート地点を提案します。</p>
+          <p>最初に6領域を1問ずつ解くと、今の理解に合うスタート地点を提案します。</p>
         </div>
       )}
 
@@ -89,7 +89,11 @@ export function LearningPath({
                   <span style={{ width: `${mastery}%` }} />
                 </div>
                 <p>{mastery}%</p>
-                <button type="button" onClick={() => onStartCourse(course)}>
+                <button
+                  type="button"
+                  aria-label={`${course.title}を${course.questionCount}問で始める`}
+                  onClick={() => onStartCourse(course)}
+                >
                   {course.questionCount}問を始める
                 </button>
               </div>
@@ -100,7 +104,7 @@ export function LearningPath({
 
       <section className="skill-chart" aria-labelledby="skill-title">
         <div>
-          <p className="eyebrow">FIVE SKILLS</p>
+          <p className="eyebrow">SIX SKILLS</p>
           <h2 id="skill-title">領域ごとの現在地</h2>
         </div>
         <dl>

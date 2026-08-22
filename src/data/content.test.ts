@@ -9,9 +9,9 @@ import {
 } from './content'
 
 describe('教材データ', () => {
-  it('47問すべてに一意なIDと有効な正解を持つ', () => {
-    expect(quizQuestions).toHaveLength(47)
-    expect(new Set(quizQuestions.map((question) => question.id)).size).toBe(47)
+  it('53問すべてに一意なIDと有効な正解を持つ', () => {
+    expect(quizQuestions).toHaveLength(53)
+    expect(new Set(quizQuestions.map((question) => question.id)).size).toBe(53)
 
     for (const question of quizQuestions) {
       expect(question.choices.length).toBeGreaterThanOrEqual(2)
@@ -23,6 +23,11 @@ describe('教材データ', () => {
 
       if (question.choiceFeedback) {
         expect(question.choiceFeedback).toHaveLength(question.choices.length)
+      }
+      if (question.observation) {
+        expect(question.observation.choices.length).toBeGreaterThanOrEqual(2)
+        expect(question.observation.feedback).toHaveLength(question.observation.choices.length)
+        expect(question.observation.correctIndex).toBeLessThan(question.observation.choices.length)
       }
     }
   })
@@ -62,7 +67,7 @@ describe('教材データ', () => {
     }
   })
 
-  it('5領域と規則10〜17を問題バンクで扱う', () => {
+  it('6領域と規則10〜18を問題バンクで扱う', () => {
     const coveredSkills = new Set(quizQuestions.map((question) => question.skill))
     const formalReferences = quizQuestions.map((question) => question.formal).join(' ')
 

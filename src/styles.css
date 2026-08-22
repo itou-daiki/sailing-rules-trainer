@@ -1495,6 +1495,7 @@ a {
 }
 
 .text-button {
+  min-height: 44px;
   padding: 8px 0;
   border: 0;
   border-bottom: 1px solid var(--ink);
@@ -1559,6 +1560,152 @@ a {
   font-size: clamp(23px, 4vw, 34px);
   line-height: 1.55;
   letter-spacing: -0.025em;
+}
+
+.observation-check {
+  margin-bottom: 22px;
+  border: 2px solid var(--navy);
+  background: #edf5f5;
+}
+
+.observation-check > header,
+.decision-step--second > header {
+  display: grid;
+  grid-template-columns: 72px 86px 1fr;
+  min-height: 52px;
+  align-items: center;
+  color: #fff;
+  background: var(--navy);
+}
+
+.observation-check > header span,
+.decision-step--second > header span {
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  color: var(--navy);
+  background: var(--yellow);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.observation-check > header strong,
+.decision-step--second > header strong {
+  padding-left: 17px;
+  font-size: 15px;
+}
+
+.observation-check > header small,
+.decision-step--second > header small {
+  color: #cad9de;
+  font-size: 11px;
+}
+
+.observation-check > p {
+  margin: 0;
+  padding: 19px 20px 14px;
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.65;
+}
+
+.observation-check > div[role="group"] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0 20px 20px;
+  border: 1px solid var(--navy);
+}
+
+.observation-check > div[role="group"] button {
+  min-height: 78px;
+  padding: 11px 12px;
+  border: 0;
+  border-left: 1px solid var(--navy);
+  color: var(--navy);
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.observation-check > div[role="group"] button:first-child {
+  border-left: 0;
+}
+
+.observation-check > div[role="group"] button:not(:disabled):hover {
+  box-shadow: inset 0 -6px 0 var(--yellow);
+}
+
+.observation-check > div[role="group"] button:disabled {
+  color: var(--ink);
+  cursor: default;
+}
+
+.observation-check > div[role="group"] button > span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--sea);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+}
+
+.observation-check > div[role="group"] button.is-correct {
+  box-shadow: inset 0 -6px 0 var(--success);
+}
+
+.observation-check > div[role="group"] button.is-wrong {
+  box-shadow: inset 0 -6px 0 var(--error);
+}
+
+.observation-check__feedback {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 16px;
+  margin-top: 0;
+  padding: 15px 20px;
+  border-top: 1px solid var(--navy);
+  background: #fff;
+}
+
+.observation-check__feedback strong {
+  color: var(--success);
+  font-size: 12px;
+}
+
+.observation-check__feedback.is-wrong strong {
+  color: var(--error);
+}
+
+.observation-check__feedback p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.decision-step--second {
+  margin-top: 22px;
+  padding-bottom: 20px;
+  border: 2px solid var(--navy);
+  background: #fff;
+}
+
+.decision-step--second .answer-list {
+  margin: 20px 20px 0;
+}
+
+.decision-step__waiting {
+  margin: 0;
+  padding: 14px 18px;
+  border: 1px dashed var(--line-dark);
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
 }
 
 .answer-list {
@@ -1665,8 +1812,8 @@ a {
 }
 
 .scenario-board {
-  width: min(100%, 480px);
-  margin: 0 auto 30px;
+  width: min(100%, 370px);
+  margin: 22px auto 25px;
   border: 1px solid var(--navy);
   background: #d8e8e9;
 }
@@ -1718,7 +1865,7 @@ a {
 }
 
 .scenario-board__boat-label {
-  font-size: 4px;
+  font-size: 3.6px;
   font-weight: 800;
 }
 
@@ -1727,6 +1874,20 @@ a {
   stroke: var(--line-dark);
   stroke-dasharray: 2 2;
   stroke-width: 0.7;
+}
+
+.scenario-board__zone {
+  fill: rgb(255 255 255 / 18%);
+  stroke: var(--red);
+  stroke-dasharray: 3 2;
+  stroke-width: 0.8;
+}
+
+.scenario-board__zone-label {
+  fill: var(--red);
+  font-family: "BIZ UDPGothic", "Hiragino Kaku Gothic ProN", sans-serif;
+  font-size: 4px;
+  font-weight: 900;
 }
 
 .scenario-board__path {
@@ -1779,6 +1940,36 @@ a {
   display: block;
   height: 100%;
   background: var(--sea);
+}
+
+.result-observation {
+  display: grid;
+  grid-template-columns: 90px 100px 1fr;
+  align-items: center;
+  margin: 26px 0;
+  padding: 17px 20px;
+  border-top: 1px solid var(--navy);
+  border-bottom: 1px solid var(--navy);
+  text-align: left;
+}
+
+.result-observation > span {
+  color: var(--sea);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.result-observation > strong {
+  color: var(--navy);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 22px;
+}
+
+.result-observation > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
 }
 
 .session-result > p:not(.eyebrow) {
@@ -1919,6 +2110,9 @@ a {
 }
 
 .site-footer a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
   color: #fff;
 }
 
@@ -2406,6 +2600,13 @@ a {
 
 .course-boat-art__measure {
   stroke: var(--red);
+  stroke-width: 1.2;
+}
+
+.course-boat-art__zone {
+  fill: rgb(255 255 255 / 20%);
+  stroke: var(--red);
+  stroke-dasharray: 4 4;
   stroke-width: 1.2;
 }
 
@@ -3144,6 +3345,57 @@ a {
 
   .question-sheet > h1 {
     font-size: 22px;
+  }
+
+  .observation-check > header,
+  .decision-step--second > header {
+    grid-template-columns: 64px 72px 1fr;
+  }
+
+  .observation-check > header small,
+  .decision-step--second > header small {
+    padding-right: 9px;
+    font-size: 9px;
+    line-height: 1.35;
+  }
+
+  .observation-check > p {
+    padding: 16px 14px 12px;
+    font-size: 13px;
+  }
+
+  .observation-check > div[role="group"] {
+    grid-template-columns: 1fr;
+    margin: 0 14px 14px;
+  }
+
+  .observation-check > div[role="group"] button {
+    min-height: 58px;
+    border-top: 1px solid var(--navy);
+    border-left: 0;
+  }
+
+  .observation-check > div[role="group"] button:first-child {
+    border-top: 0;
+  }
+
+  .observation-check__feedback {
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding: 14px;
+  }
+
+  .decision-step--second .answer-list {
+    margin: 14px 14px 0;
+  }
+
+  .result-observation {
+    grid-template-columns: 1fr auto;
+    gap: 6px 16px;
+  }
+
+  .result-observation > p {
+    grid-column: 1 / -1;
   }
 
   .answer-choice {

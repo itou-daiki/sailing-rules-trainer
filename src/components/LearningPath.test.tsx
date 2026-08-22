@@ -8,7 +8,7 @@ import { LearningPath } from './LearningPath'
 afterEach(cleanup)
 
 describe('練習コース一覧', () => {
-  it('5つのレッスンを、内容が異なる艇図と一緒に案内する', () => {
+  it('6つのレッスンを、内容が異なる艇図と一緒に案内する', () => {
     render(
       <LearningPath
         progress={createEmptyProgress()}
@@ -38,7 +38,7 @@ describe('練習コース一覧', () => {
       />,
     )
 
-    fireEvent.click(screen.getByRole('button', { name: '6問を始める' }))
+    fireEvent.click(screen.getByRole('button', { name: '旗を見て動くを6問で始める' }))
 
     expect(onStartCourse).toHaveBeenCalledWith(learningCourses[0])
   })

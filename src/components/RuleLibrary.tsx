@@ -1,4 +1,5 @@
 import { coreRules } from '../data/content'
+import { RuleEvolution } from './RuleEvolution'
 
 export function RuleLibrary({ onPractice }: { onPractice: () => void }) {
   return (
@@ -11,9 +12,19 @@ export function RuleLibrary({ onPractice }: { onPractice: () => void }) {
             最初に規則番号を暗記せず、タック・重なり・位置の順で整理します。
           </p>
         </div>
-        <button className="button button--ink" type="button" onClick={onPractice}>
-          状況問題を始める
-        </button>
+        <div className="section-heading__actions">
+          <button
+            aria-controls="rule-changes"
+            className="button button--line"
+            type="button"
+            onClick={() => document.getElementById('rule-changes')?.scrollIntoView()}
+          >
+            2025–2028の変更を見る
+          </button>
+          <button className="button button--ink" type="button" onClick={onPractice}>
+            状況問題を始める
+          </button>
+        </div>
       </div>
 
       <div className="decision-line" aria-label="基本の判断順序">
@@ -51,6 +62,8 @@ export function RuleLibrary({ onPractice }: { onPractice: () => void }) {
           </article>
         ))}
       </div>
+
+      <RuleEvolution />
     </section>
   )
 }

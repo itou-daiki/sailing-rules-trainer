@@ -1,16 +1,26 @@
 export type FlagArtworkKind =
   | 'ap'
+  | 'ap-h'
+  | 'ap-a'
+  | 'ap-numeral'
   | 'p'
   | 'i'
+  | 'z'
   | 'u'
   | 'black'
   | 'x'
   | 'first-sub'
   | 's'
   | 'c'
+  | 'c-starboard'
+  | 'c-port'
+  | 'c-shorter'
+  | 'c-longer'
   | 'y'
   | 'v'
   | 'n'
+  | 'n-h'
+  | 'n-a'
   | 'l'
   | 'm'
   | 'orange'
@@ -28,6 +38,7 @@ export interface RaceSignal {
   sailorAction: string
   detail: string
   reference: string
+  variants?: Array<{ code: string; meaning: string }>
 }
 
 export interface CoreRule {
@@ -130,6 +141,8 @@ export const RULESET = {
   jsafUrl: 'https://www.jsaf.or.jp/hp/about/committee/rule/rule-reg',
 } as const
 
+// Source: World Sailing, RRS 2025–2028 “Race Signals” (current through 2026-04-20)
+// https://www.sailing.org/wp-content/uploads/2026/04/2025-2028-RRS-with-Changes-and-Corrections.pdf
 export const raceSignals: RaceSignal[] = [
   {
     id: 'ap',
@@ -141,6 +154,43 @@ export const raceSignals: RaceSignal[] = [
     sailorAction: '新しい予告信号を待つ。ラインへ突っ込まない。',
     detail: '降下後、通常は1分で予告信号。別の延期・中止信号が続く場合もある。',
     reference: 'レース信号：延期信号',
+  },
+  {
+    id: 'ap-h',
+    code: 'AP + H',
+    name: 'AP＋H旗',
+    artwork: 'ap-h',
+    stage: 'スタート前',
+    summary: 'まだ始まっていないレースを延期。続きは陸上で知らせる。',
+    sailorAction: '海上でスタートを待たず、帰着後に公式掲示と次の信号を確認する。',
+    detail: '回答旗（AP）の下にH旗。単独のAPと違い、次の案内場所が「陸上」になる。',
+    reference: 'レース信号：延期信号（AP over H）',
+  },
+  {
+    id: 'ap-a',
+    code: 'AP + A',
+    name: 'AP＋A旗',
+    artwork: 'ap-a',
+    stage: 'スタート前',
+    summary: 'まだ始まっていないレースを延期し、今日はもうレースを行わない。',
+    sailorAction: '帰着する。今日の再スタートを待たず、次の日程を公式掲示で確認する。',
+    detail: '回答旗（AP）の下にA旗。「陸上で続報」のH旗と、「今日は終了」のA旗を見分ける。',
+    reference: 'レース信号：延期信号（AP over A）',
+  },
+  {
+    id: 'ap-numeral',
+    code: 'AP + 1–9',
+    name: 'AP＋数字旗1–9',
+    artwork: 'ap-numeral',
+    stage: 'スタート前',
+    summary: '予定されたスタート時刻から、数字旗と同じ時間だけ延期する。',
+    sailorAction: '数字旗を読み、予定時刻へその時間を足して次の動きを組み立てる。',
+    detail: '数字旗1なら1時間、9なら9時間の延期。数字は「今から」ではなく、予定されたスタート時刻から数える。',
+    reference: 'レース信号：延期信号（AP over a Numeral Pennant 1–9）',
+    variants: Array.from({ length: 9 }, (_, index) => ({
+      code: `数字旗 ${index + 1}`,
+      meaning: `${index + 1}時間延期`,
+    })),
   },
   {
     id: 'p',
@@ -163,6 +213,17 @@ export const raceSignals: RaceSignal[] = [
     sailorAction: '早くラインを越えたら、延長線の外側を回って戻る。',
     detail: 'スタート前1分間のライン越えに関する規則。戻り方まで覚える。',
     reference: '規則30.1',
+  },
+  {
+    id: 'z',
+    code: 'Z',
+    name: 'Z旗',
+    artwork: 'z',
+    stage: 'スタート前',
+    summary: 'スタート前1分間、三角形に入ると20%得点ペナルティー。',
+    sailorAction: '残り1分は、スタート両端と第1マークでできる三角形の外にいる。',
+    detail: '違反艇には審問なしで20%得点ペナルティーが課される。U旗や黒旗の「失格」と区別する。',
+    reference: '規則30.2 Z旗規則',
   },
   {
     id: 'u',
@@ -220,6 +281,28 @@ export const raceSignals: RaceSignal[] = [
     reference: 'レース信号：中止信号',
   },
   {
+    id: 'n-h',
+    code: 'N + H',
+    name: 'N＋H旗',
+    artwork: 'n-h',
+    stage: 'レース中',
+    summary: '進行中の全レースを中止。続きは陸上で知らせる。',
+    sailorAction: 'フィニッシュを目指さず帰着し、陸上の公式掲示と次の信号を確認する。',
+    detail: 'N旗の下にH旗。単独Nの「スタート・エリアへ戻る」ではなく、続報は陸上で出る。',
+    reference: 'レース信号：中止信号（N over H）',
+  },
+  {
+    id: 'n-a',
+    code: 'N + A',
+    name: 'N＋A旗',
+    artwork: 'n-a',
+    stage: 'レース中',
+    summary: '進行中の全レースを中止し、今日はもうレースを行わない。',
+    sailorAction: 'フィニッシュを目指さず帰着する。今日の再スタートは待たない。',
+    detail: 'N旗の下にA旗。「中止して陸上で続報」のN＋Hと、「今日は終了」のN＋Aを見分ける。',
+    reference: 'レース信号：中止信号（N over A）',
+  },
+  {
     id: 's',
     code: 'S',
     name: 'S旗',
@@ -240,6 +323,50 @@ export const raceSignals: RaceSignal[] = [
     sailorAction: '反復音響信号を聞き、方位や距離の表示を読む。',
     detail: '変更された次のマークへ向かう。単に「コース短縮」ではない。',
     reference: '規則33',
+  },
+  {
+    id: 'c-starboard',
+    code: 'C + ▲',
+    name: 'C旗＋緑三角（右へ）',
+    artwork: 'c-starboard',
+    stage: 'コース',
+    summary: '次のマークが、元の位置より右舷側へ移った。',
+    sailorAction: '反復音響信号を聞き、緑三角を確認して新しい右舷側の位置へ向かう。',
+    detail: 'C旗は次のマーク位置の変更。緑の三角形は「右舷側へ」を示す。',
+    reference: '規則33／レース信号：Changing the Next Leg',
+  },
+  {
+    id: 'c-port',
+    code: 'C + ■',
+    name: 'C旗＋赤四角（左へ）',
+    artwork: 'c-port',
+    stage: 'コース',
+    summary: '次のマークが、元の位置より左舷側へ移った。',
+    sailorAction: '反復音響信号を聞き、赤四角を確認して新しい左舷側の位置へ向かう。',
+    detail: 'C旗は次のマーク位置の変更。赤い長方形は「左舷側へ」を示す。',
+    reference: '規則33／レース信号：Changing the Next Leg',
+  },
+  {
+    id: 'c-shorter',
+    code: 'C + −',
+    name: 'C旗＋マイナス（短く）',
+    artwork: 'c-shorter',
+    stage: 'コース',
+    summary: '次のレグの長さが短くなった。',
+    sailorAction: '反復音響信号とマイナス表示を確認し、近くなった次のマークを探す。',
+    detail: 'コース全体の短縮を示すS旗ではない。C旗とマイナスは「次のレグが短くなる」。',
+    reference: '規則33／レース信号：Changing the Next Leg',
+  },
+  {
+    id: 'c-longer',
+    code: 'C + ＋',
+    name: 'C旗＋プラス（長く）',
+    artwork: 'c-longer',
+    stage: 'コース',
+    summary: '次のレグの長さが長くなった。',
+    sailorAction: '反復音響信号とプラス表示を確認し、遠くなった次のマークを探す。',
+    detail: 'C旗とプラスは「次のレグが長くなる」。方向変更の緑三角・赤四角と区別する。',
+    reference: '規則33／レース信号：Changing the Next Leg',
   },
   {
     id: 'm',
@@ -400,7 +527,21 @@ const signalQuestion = (
   skill:
     flagId === 'y' || flagId === 'v'
       ? 'safety-signals'
-      : ['s', 'c', 'n', 'm', 'l', 'orange', 'blue'].includes(flagId)
+      : [
+          's',
+          'c',
+          'c-starboard',
+          'c-port',
+          'c-shorter',
+          'c-longer',
+          'n',
+          'n-h',
+          'n-a',
+          'm',
+          'l',
+          'orange',
+          'blue',
+        ].includes(flagId)
         ? 'course-signals'
         : 'start-signals',
   difficulty,
@@ -493,6 +634,116 @@ export const quizQuestions: QuizQuestion[] = [
     '安全に関する指示を受けるため、指定チャンネルを聴取します。',
     ['白地に赤いXがV旗', 'PFDのY旗とは役割が違う'],
     '規則37 捜索および救助の指示',
+  ),
+  signalQuestion(
+    'q-ap-h-ashore',
+    'ap-h',
+    '回答旗の下にH旗が掲揚されました。次の案内はどこで確認する？',
+    ['陸上', '第1マーク', 'フィニッシュ艇'],
+    0,
+    'まだ始まっていないレースは延期され、続きの信号は陸上で出ます。',
+    ['上の回答旗で「延期」を読む', '下のH旗で「続報は陸上」を読む'],
+    'レース信号「AP over H」',
+    2,
+  ),
+  signalQuestion(
+    'q-ap-a-today',
+    'ap-a',
+    '回答旗の下にA旗が掲揚されました。今日のレースは？',
+    ['すべて1時間だけ延期', 'まだ始まっていないレースは今日は行わない', '進行中の艇だけ続行'],
+    1,
+    '未スタートのレースは延期され、今日はもうレースを行いません。',
+    ['APは未スタートのレースを延期', 'A旗の組み合わせは「今日は終了」'],
+    'レース信号「AP over A」',
+    2,
+  ),
+  signalQuestion(
+    'q-ap-numeral-delay',
+    'ap-numeral',
+    '回答旗の下に数字旗3。延期時間はどう読む？',
+    ['掲揚から3分', '予定スタート時刻から3時間', '現在時刻から30分'],
+    1,
+    '数字旗3なら、予定されたスタート時刻から3時間の延期です。',
+    ['数字1〜9と延期時間1〜9時間が対応', '基準は「予定されたスタート時刻」'],
+    'レース信号「AP over a Numeral Pennant 1–9」',
+    2,
+  ),
+  signalQuestion(
+    'q-z-penalty',
+    'z',
+    'Z旗の残り1分で、艇体がスタート両端と第1マークの三角形に入りました。基本のペナルティーは？',
+    ['20%得点ペナルティー', '必ず失格', '警告だけ'],
+    0,
+    'Z旗規則では、審問なしに20%得点ペナルティーが課されます。',
+    ['残り1分の三角形を見る', 'U旗・黒旗の失格と区別する'],
+    '規則30.2 Z旗規則',
+    2,
+  ),
+  signalQuestion(
+    'q-n-h-ashore',
+    'n-h',
+    'レース中、N旗の下にH旗。まずどうする？',
+    ['レースを続けてフィニッシュする', '帰着し、陸上で続報を確認する', 'スタート・エリアで必ず再スタートする'],
+    1,
+    '進行中の全レースは中止され、続きの信号は陸上で出ます。',
+    ['N旗で「進行中の全レースを中止」', 'H旗で「続報は陸上」'],
+    'レース信号「N over H」',
+    2,
+  ),
+  signalQuestion(
+    'q-n-a-today',
+    'n-a',
+    'レース中、N旗の下にA旗。今日の予定は？',
+    ['中止後すぐ同じ海面で再スタート', '進行中の全レースを中止し、今日は終了', 'このクラスだけ1時間延期'],
+    1,
+    '進行中の全レースは中止され、今日はもうレースを行いません。',
+    ['N旗で「中止」', 'A旗で「今日は終了」'],
+    'レース信号「N over A」',
+    2,
+  ),
+  signalQuestion(
+    'q-c-starboard',
+    'c-starboard',
+    'C旗と緑の三角形が表示されています。次のマークはどちらへ移った？',
+    ['元の位置より右舷側', '元の位置より左舷側', '距離だけ短くなった'],
+    0,
+    '緑の三角形は、次のマークが右舷側へ移ったことを示します。',
+    ['C旗で次のマーク位置の変更', '緑三角＝右舷側'],
+    '規則33／レース信号「Changing the Next Leg」',
+    2,
+  ),
+  signalQuestion(
+    'q-c-port',
+    'c-port',
+    'C旗と赤い長方形が表示されています。次のマークはどちらへ移った？',
+    ['元の位置より右舷側', '元の位置より左舷側', '距離だけ長くなった'],
+    1,
+    '赤い長方形は、次のマークが左舷側へ移ったことを示します。',
+    ['C旗で次のマーク位置の変更', '赤四角＝左舷側'],
+    '規則33／レース信号「Changing the Next Leg」',
+    2,
+  ),
+  signalQuestion(
+    'q-c-shorter',
+    'c-shorter',
+    'C旗とマイナス記号が表示されています。何が変わる？',
+    ['次のレグが短くなる', 'コース全体を短縮して直ちにフィニッシュ', '次のレグが長くなる'],
+    0,
+    'マイナス記号は、次のレグの長さが短くなったことを示します。',
+    ['C＋マイナスは次のレグの距離変更', 'S旗のコース短縮と区別する'],
+    '規則33／レース信号「Changing the Next Leg」',
+    2,
+  ),
+  signalQuestion(
+    'q-c-longer',
+    'c-longer',
+    'C旗とプラス記号が表示されています。何が変わる？',
+    ['次のレグが短くなる', '次のレグが長くなる', '今日はレース終了'],
+    1,
+    'プラス記号は、次のレグの長さが長くなったことを示します。',
+    ['C＋プラスは次のレグの距離変更', '方向変更の緑三角・赤四角と区別する'],
+    '規則33／レース信号「Changing the Next Leg」',
+    2,
   ),
   {
     id: 'q-r10-port-starboard',

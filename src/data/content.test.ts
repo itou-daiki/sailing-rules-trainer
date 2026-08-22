@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { coreRules, quizQuestions, raceSignals, skillDefinitions } from './content'
 
 describe('教材データ', () => {
-  it('32問すべてに一意なIDと有効な正解を持つ', () => {
-    expect(quizQuestions).toHaveLength(32)
-    expect(new Set(quizQuestions.map((question) => question.id)).size).toBe(32)
+  it('42問すべてに一意なIDと有効な正解を持つ', () => {
+    expect(quizQuestions).toHaveLength(42)
+    expect(new Set(quizQuestions.map((question) => question.id)).size).toBe(42)
 
     for (const question of quizQuestions) {
       expect(question.choices.length).toBeGreaterThanOrEqual(2)
@@ -20,7 +20,7 @@ describe('教材データ', () => {
     }
   })
 
-  it('16種の信号旗を各1問で確認できる', () => {
+  it('公式レース信号26パターンを各1問で確認できる', () => {
     const signalQuestionFlagIds = quizQuestions
       .filter((question) => question.category === 'signal')
       .map((question) => question.flagId)
@@ -29,6 +29,23 @@ describe('教材データ', () => {
     expect(new Set(signalQuestionFlagIds)).toEqual(
       new Set(raceSignals.map((signal) => signal.id)),
     )
+
+    expect(raceSignals).toHaveLength(26)
+    const signalIds = new Set(raceSignals.map((signal) => signal.id))
+    for (const id of [
+      'ap-h',
+      'ap-a',
+      'ap-numeral',
+      'z',
+      'n-h',
+      'n-a',
+      'c-starboard',
+      'c-port',
+      'c-shorter',
+      'c-longer',
+    ]) {
+      expect(signalIds).toContain(id)
+    }
   })
 
   it('5領域と規則10〜17を問題バンクで扱う', () => {

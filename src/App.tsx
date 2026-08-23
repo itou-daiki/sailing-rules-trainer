@@ -35,12 +35,16 @@ import {
 } from './domain/teamChallenge'
 
 type Page = 'home' | 'learn' | 'signals' | 'rules' | 'progress' | 'practice' | 'team'
+type ReasoningOrder = 'observe-first' | 'decide-first'
 
 interface SessionConfig {
   label: string
   size: number
   category?: QuestionCategory
   skills?: SkillId[]
+  difficulties?: Array<QuizQuestion['difficulty']>
+  requiresObservation?: boolean
+  reasoningOrder?: ReasoningOrder
   diagnostic?: boolean
   shared?: boolean
   fixedSeed?: string
@@ -126,6 +130,8 @@ export default function App() {
         : selectPracticeQuestions(quizQuestions, progress, {
             category: config.category,
             skills: config.skills,
+            difficulties: config.difficulties,
+            requiresObservation: config.requiresObservation,
             size: config.size,
             seed,
             diagnostic: config.diagnostic,
@@ -144,6 +150,17 @@ export default function App() {
 
   const startDiagnostic = () =>
     beginSession({ label: '6領域の現在地チェック', size: 6, diagnostic: true })
+
+  const startIntermediate = () =>
+    beginSession({
+      label: '中級ケース判定｜先に決める',
+      size: 5,
+      category: 'rule',
+      skills: ['right-of-way', 'rule-limitations', 'mark-room'],
+      difficulties: [2, 3],
+      requiresObservation: true,
+      reasoningOrder: 'decide-first',
+    })
 
   const startCourse = (course: LearningCourse) =>
     beginSession({
@@ -248,6 +265,7 @@ export default function App() {
             progress={progress}
             stats={stats}
             onStart={() => startPractice()}
+            onIntermediate={startIntermediate}
             onDiagnostic={startDiagnostic}
             onNavigate={navigate}
             onStartSequence={() => {
@@ -263,6 +281,7 @@ export default function App() {
             questions={quizQuestions}
             onDiagnostic={startDiagnostic}
             onStartCourse={startCourse}
+            onStartIntermediate={startIntermediate}
           />
         ) : null}
         {page === 'signals' ? <SignalLibrary onPractice={() => startPractice('signal')} /> : null}
@@ -292,6 +311,7 @@ export default function App() {
             onAnswer={handleAnswer}
             onComplete={handleSessionComplete}
             shared={sessionConfig.shared}
+            reasoningOrder={sessionConfig.reasoningOrder}
             shareUrl={sessionConfig.shareUrl}
             onFinish={finishSession}
             onRetry={() => beginSession(sessionConfig, true)}
@@ -349,6 +369,7 @@ interface HomePageProps {
   progress: LearningProgress
   stats: ReturnType<typeof getDashboardStats>
   onStart: () => void
+  onIntermediate: () => void
   onDiagnostic: () => void
   onNavigate: (page: 'learn' | 'signals' | 'rules') => void
   onStartSequence: () => void
@@ -359,6 +380,7 @@ function HomePage({
   progress,
   stats,
   onStart,
+  onIntermediate,
   onDiagnostic,
   onNavigate,
   onStartSequence,
@@ -395,6 +417,9 @@ function HomePage({
             </button>
             <p>登録不要・記録はこの端末だけに保存</p>
           </div>
+          <button type="button" className="hero__intermediate" onClick={onIntermediate}>
+            基本が分かる人へ：中級ケースを5問で判定 <span aria-hidden="true">→</span>
+          </button>
         </div>
         <aside className="hero__status" aria-label="学習状況">
           <p>TODAY'S LOG</p>

@@ -15,6 +15,7 @@ describe('練習コース一覧', () => {
         questions={quizQuestions}
         onDiagnostic={vi.fn()}
         onStartCourse={vi.fn()}
+        onStartIntermediate={vi.fn()}
       />,
     )
 
@@ -35,10 +36,11 @@ describe('練習コース一覧', () => {
         questions={quizQuestions}
         onDiagnostic={vi.fn()}
         onStartCourse={onStartCourse}
+        onStartIntermediate={vi.fn()}
       />,
     )
 
-    fireEvent.click(screen.getByRole('button', { name: '旗を見て動くを6問で始める' }))
+    fireEvent.click(screen.getByRole('button', { name: '旗を見て動く：6問を始める' }))
 
     expect(onStartCourse).toHaveBeenCalledWith(learningCourses[0])
   })
@@ -50,6 +52,7 @@ describe('練習コース一覧', () => {
         questions={quizQuestions}
         onDiagnostic={vi.fn()}
         onStartCourse={vi.fn()}
+        onStartIntermediate={vi.fn()}
       />,
     )
 
@@ -61,5 +64,23 @@ describe('練習コース一覧', () => {
 
     expect(portSail).toHaveAttribute('d', expect.stringContaining('L18 8'))
     expect(starboardSail).toHaveAttribute('d', expect.stringContaining('L-18 8'))
+  })
+
+  it('中級者はヒントなしで判断するケースへ進める', () => {
+    const onStartIntermediate = vi.fn()
+    render(
+      <LearningPath
+        progress={createEmptyProgress()}
+        questions={quizQuestions}
+        onDiagnostic={vi.fn()}
+        onStartCourse={vi.fn()}
+        onStartIntermediate={onStartIntermediate}
+      />,
+    )
+
+    expect(screen.getByText('見る → 決める')).toBeInTheDocument()
+    expect(screen.getByText('先に決める → 根拠を示す')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /中級ケース5問を始める/ }))
+    expect(onStartIntermediate).toHaveBeenCalledOnce()
   })
 })

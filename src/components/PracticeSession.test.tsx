@@ -95,4 +95,39 @@ describe('PracticeSession', () => {
     fireEvent.click(screen.getByRole('button', { name: '結果を見る' }))
     expect(onComplete).toHaveBeenCalledWith(1, 1, ['right-of-way'])
   })
+
+  it('中級ケースでは先に結論を固定し、その後に根拠を問う', () => {
+    const onAnswer = vi.fn()
+    render(
+      <PracticeSession
+        questions={[observationQuestion]}
+        reasoningOrder="decide-first"
+        onAnswer={onAnswer}
+        onFinish={vi.fn()}
+        onRetry={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /A艇/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /反対タック/ })).not.toBeInTheDocument()
+    expect(screen.getByText('ヒントを見る前に、自分の結論を固定')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /A艇/ }))
+    expect(screen.getByRole('button', { name: /A艇/ })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /反対タック/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /自信あり/ })).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /反対タック/ }))
+    fireEvent.click(screen.getByRole('button', { name: /自信あり/ }))
+
+    expect(onAnswer).toHaveBeenCalledWith('test-observation', {
+      isCorrect: true,
+      confidence: 'sure',
+      observationCorrect: true,
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: '結果を見る' }))
+    expect(screen.getByRole('heading', { name: '中級ケースの結果' })).toBeInTheDocument()
+    expect(screen.getByText('根拠')).toBeInTheDocument()
+  })
 })

@@ -133,6 +133,27 @@ describe('learningEngine', () => {
     expect(selected.every((question) => question.skill === 'right-of-way')).toBe(true)
   })
 
+  it('中級練習では難度2以上かつ判断材料つきの規則問題だけを選ぶ', () => {
+    const selected = selectPracticeQuestions(quizQuestions, createEmptyProgress(), {
+      category: 'rule',
+      skills: ['right-of-way', 'rule-limitations', 'mark-room'],
+      difficulties: [2, 3],
+      requiresObservation: true,
+      size: 5,
+      seed: 'intermediate',
+    })
+
+    expect(selected).toHaveLength(5)
+    expect(
+      selected.every(
+        (question) =>
+          question.category === 'rule' &&
+          question.difficulty >= 2 &&
+          Boolean(question.observation),
+      ),
+    ).toBe(true)
+  })
+
   it('部活チャレンジは同じコードなら同じ問題順になる', () => {
     const options = {
       skills: ['mark-room'] as const,

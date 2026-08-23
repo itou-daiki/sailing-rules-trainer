@@ -347,6 +347,8 @@ export const selectPracticeQuestions = (
   options: {
     category?: QuestionCategory
     skills?: SkillId[]
+    difficulties?: Array<QuizQuestion['difficulty']>
+    requiresObservation?: boolean
     size?: number
     seed?: string
     diagnostic?: boolean
@@ -356,6 +358,8 @@ export const selectPracticeQuestions = (
   const {
     category,
     skills,
+    difficulties,
+    requiresObservation = false,
     size = 5,
     seed = dateKey(new Date()),
     diagnostic = false,
@@ -364,7 +368,9 @@ export const selectPracticeQuestions = (
   const candidates = questions.filter(
     (question) =>
       (!category || question.category === category) &&
-      (!skills || skills.includes(question.skill)),
+      (!skills || skills.includes(question.skill)) &&
+      (!difficulties || difficulties.includes(question.difficulty)) &&
+      (!requiresObservation || Boolean(question.observation)),
   )
 
   if (diagnostic) {

@@ -12,6 +12,7 @@ interface LearningPathProps {
   questions: QuizQuestion[]
   onDiagnostic: () => void
   onStartCourse: (course: LearningCourse) => void
+  onStartIntermediate: () => void
 }
 
 const courseMastery = (course: LearningCourse, stats: SkillStats[]) => {
@@ -25,6 +26,7 @@ export function LearningPath({
   questions,
   onDiagnostic,
   onStartCourse,
+  onStartIntermediate,
 }: LearningPathProps) {
   const stats = getSkillStats(progress, questions)
   const recommendedId = progress.diagnostic?.recommendedCourseId
@@ -58,6 +60,32 @@ export function LearningPath({
         </div>
       )}
 
+      <section className="level-map" aria-labelledby="level-map-title">
+        <div className="level-map__heading">
+          <p className="eyebrow">CHOOSE YOUR TRAINING</p>
+          <h2 id="level-map-title">今の段階で、考える順番を変える</h2>
+        </div>
+        <div className="level-map__routes">
+          <article>
+            <span>BASIC / 初学者</span>
+            <h3>見る → 決める</h3>
+            <p>タック・重なり・ゾーンを先に確認し、判断の型を身につけます。</p>
+            <small>下の6コースから始める</small>
+          </article>
+          <article className="level-map__intermediate">
+            <span>APPLY / 中級</span>
+            <h3>先に決める → 根拠を示す</h3>
+            <p>ヒントなしで結論を固定してから、見た判断材料を選びます。</p>
+            <button type="button" className="button button--ink" onClick={onStartIntermediate}>
+              中級ケース5問を始める <span aria-hidden="true">→</span>
+            </button>
+          </article>
+        </div>
+        <p className="level-map__scope">
+          ここでの「中級」は、規則10〜18の状況判断です。艇速・操船・戦術は、水上練習と指導者のフィードバックが別に必要です。
+        </p>
+      </section>
+
       <ol className="course-list">
         {learningCourses.map((course) => {
           const mastery = courseMastery(course, stats)
@@ -85,13 +113,19 @@ export function LearningPath({
                 </div>
               </div>
               <div className="course-list__action">
-                <div aria-label={`習熟度${mastery}%`}>
+                <div
+                  role="progressbar"
+                  aria-label={`${course.title}の習熟度`}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={mastery}
+                >
                   <span style={{ width: `${mastery}%` }} />
                 </div>
                 <p>{mastery}%</p>
                 <button
                   type="button"
-                  aria-label={`${course.title}を${course.questionCount}問で始める`}
+                  aria-label={`${course.title}：${course.questionCount}問を始める`}
                   onClick={() => onStartCourse(course)}
                 >
                   {course.questionCount}問を始める

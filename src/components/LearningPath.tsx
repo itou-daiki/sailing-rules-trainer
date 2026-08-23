@@ -36,13 +36,13 @@ export function LearningPath({
       <div className="section-heading section-heading--split">
         <div>
           <p className="eyebrow">TRAINING COURSE</p>
-          <h1 id="course-title">迷わず進める、6つの練習</h1>
+          <h1 id="course-title">迷わず進める、9つの練習</h1>
           <p className="lead">
             暗記の順ではなく、艇上で判断する順に並べています。各コースは5分前後です。
           </p>
         </div>
         <button type="button" className="button button--ink" onClick={onDiagnostic}>
-          {progress.diagnostic ? '現在地を測り直す' : '6問で現在地を測る'}
+          {progress.diagnostic ? '現在地を測り直す' : '9問で現在地を測る'}
         </button>
       </div>
 
@@ -56,7 +56,7 @@ export function LearningPath({
       ) : (
         <div className="diagnostic-note diagnostic-note--open">
           <span>FIRST STEP</span>
-          <p>最初に6領域を1問ずつ解くと、今の理解に合うスタート地点を提案します。</p>
+          <p>最初に9領域を1問ずつ解くと、今の理解に合うスタート地点を提案します。</p>
         </div>
       )}
 
@@ -70,7 +70,7 @@ export function LearningPath({
             <span>BASIC / 初学者</span>
             <h3>見る → 決める</h3>
             <p>タック・重なり・ゾーンを先に確認し、判断の型を身につけます。</p>
-            <small>下の6コースから始める</small>
+            <small>下の9コースから始める</small>
           </article>
           <article className="level-map__intermediate">
             <span>APPLY / 中級</span>
@@ -82,7 +82,7 @@ export function LearningPath({
           </article>
         </div>
         <p className="level-map__scope">
-          ここでの「中級」は、規則10〜18の状況判断です。艇速・操船・戦術は、水上練習と指導者のフィードバックが別に必要です。
+          ここでの「中級」は、艇が出会う場面に加え、障害物・違反後・推進・抗議までの状況判断です。艇速・操船・戦術は、水上練習と指導者のフィードバックが別に必要です。
         </p>
       </section>
 
@@ -138,7 +138,7 @@ export function LearningPath({
 
       <section className="skill-chart" aria-labelledby="skill-title">
         <div>
-          <p className="eyebrow">SIX SKILLS</p>
+          <p className="eyebrow">NINE SKILLS</p>
           <h2 id="skill-title">領域ごとの現在地</h2>
         </div>
         <dl>

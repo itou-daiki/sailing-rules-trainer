@@ -9,9 +9,9 @@ import {
 } from './content'
 
 describe('教材データ', () => {
-  it('53問すべてに一意なIDと有効な正解を持つ', () => {
-    expect(quizQuestions).toHaveLength(53)
-    expect(new Set(quizQuestions.map((question) => question.id)).size).toBe(53)
+  it('77問すべてに一意なIDと有効な正解を持つ', () => {
+    expect(quizQuestions).toHaveLength(77)
+    expect(new Set(quizQuestions.map((question) => question.id)).size).toBe(77)
 
     for (const question of quizQuestions) {
       expect(question.choices.length).toBeGreaterThanOrEqual(2)
@@ -67,7 +67,7 @@ describe('教材データ', () => {
     }
   })
 
-  it('6領域と規則10〜18を問題バンクで扱う', () => {
+  it('9領域と初学者〜中級者に重要な規則を問題バンクで扱う', () => {
     const coveredSkills = new Set(quizQuestions.map((question) => question.skill))
     const formalReferences = quizQuestions.map((question) => question.formal).join(' ')
 
@@ -75,6 +75,15 @@ describe('教材データ', () => {
     for (const rule of coreRules) {
       expect(formalReferences).toContain(`規則${rule.number}`)
       expect(rule.example.trim()).not.toBe('')
+    }
+
+    expect(skillDefinitions).toHaveLength(9)
+    for (const skill of ['penalties', 'obstructions-safety', 'race-conduct'] as const) {
+      expect(quizQuestions.filter((question) => question.skill === skill).length)
+        .toBeGreaterThanOrEqual(6)
+    }
+    for (const ruleNumber of ['1', '3', '19', '20', '21', '22', '23', '28', '31', '40', '41', '42', '43', '44', '60']) {
+      expect(formalReferences).toContain(`規則${ruleNumber}`)
     }
   })
 })

@@ -84,6 +84,9 @@ const courseBySkill: Record<SkillId, string> = {
   'right-of-way': 'boats-meet',
   'rule-limitations': 'right-with-limits',
   'mark-room': 'mark-room',
+  penalties: 'after-incident',
+  'obstructions-safety': 'obstacles-safety',
+  'race-conduct': 'fair-racing',
 }
 
 const loadInitialProgress = (): LearningProgress => {
@@ -149,14 +152,25 @@ export default function App() {
     })
 
   const startDiagnostic = () =>
-    beginSession({ label: '6領域の現在地チェック', size: 6, diagnostic: true })
+    beginSession({
+      label: `${skillDefinitions.length}領域の現在地チェック`,
+      size: skillDefinitions.length,
+      diagnostic: true,
+    })
 
   const startIntermediate = () =>
     beginSession({
       label: '中級ケース判定｜先に決める',
       size: 5,
       category: 'rule',
-      skills: ['right-of-way', 'rule-limitations', 'mark-room'],
+      skills: [
+        'right-of-way',
+        'rule-limitations',
+        'mark-room',
+        'penalties',
+        'obstructions-safety',
+        'race-conduct',
+      ],
       difficulties: [2, 3],
       requiresObservation: true,
       reasoningOrder: 'decide-first',
@@ -412,7 +426,7 @@ function HomePage({
               className="button button--signal"
               onClick={hasDiagnostic ? onStart : onDiagnostic}
             >
-              {hasDiagnostic ? '今日の5問を始める' : '6問で現在地を測る'}
+              {hasDiagnostic ? '今日の5問を始める' : `${skillDefinitions.length}問で現在地を測る`}
               <span aria-hidden="true">→</span>
             </button>
             <p>登録不要・記録はこの端末だけに保存</p>
@@ -553,7 +567,7 @@ function ProgressPage({ progress, stats, onStart }: ProgressPageProps) {
       </dl>
 
       <div className="progress-skills">
-        <h2>6領域の習熟度</h2>
+        <h2>{skillDefinitions.length}領域の習熟度</h2>
         <dl>
           {skillDefinitions.map((skill) => {
             const skillStat = skillStats.find((item) => item.id === skill.id)

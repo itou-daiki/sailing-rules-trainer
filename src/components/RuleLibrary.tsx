@@ -2,30 +2,50 @@ import { coreRules } from '../data/content'
 import { BeginnerRuleGuide } from './BeginnerRuleGuide'
 import { RuleEvolution } from './RuleEvolution'
 
+const rulesWithIds = (ids: string[]) => coreRules.filter((rule) => ids.includes(rule.id))
+
 const ruleGroups = [
   {
     label: 'まず覚える',
     title: 'タックと艇の位置',
     description: '規則10〜13。帆の左右と、横・前後・タック中を見ます。',
-    rules: coreRules.slice(0, 4),
+    rules: rulesWithIds(['r10', 'r11', 'r12', 'r13']),
   },
   {
     label: '安全のため',
     title: '優先側にも制限がある',
     description: '規則14〜16。優先でも、接触や急な進路変更はできません。',
-    rules: coreRules.slice(4, 7),
+    rules: rulesWithIds(['r14', 'r15', 'r16']),
   },
   {
     label: '慣れてから',
     title: '追いついた風下艇の制限',
     description: '規則17。成立条件が多いので、最初は結論だけで大丈夫です。',
-    rules: coreRules.slice(7, 8),
+    rules: rulesWithIds(['r17']),
   },
   {
     label: 'マークで使う',
     title: 'ゾーンへ入る瞬間を止めて見る',
     description: '規則18。重なり、内側・外側、タックの順に整理します。',
-    rules: coreRules.slice(8),
+    rules: rulesWithIds(['r18']),
+  },
+  {
+    label: '危険を避ける',
+    title: '安全と障害物を先に処理する',
+    description: '規則1、3、19〜23、40。防波堤、戻る艇、転覆艇、PFDへの行動です。',
+    rules: rulesWithIds(['r1', 'r3', 'r19', 'r20', 'r21', 'r22', 'r23', 'r40']),
+  },
+  {
+    label: '違反したら',
+    title: '回転・リタイア・免罪を選ぶ',
+    description: '規則31、43、44。接触の事実と、違反後の行動までを一組で覚えます。',
+    rules: rulesWithIds(['r31', 'r43', 'r44']),
+  },
+  {
+    label: '公正に走る',
+    title: 'コース・推進・援助・抗議',
+    description: '規則28、41、42、60。速く走るだけでなく、正しい方法と手続を確認します。',
+    rules: rulesWithIds(['r28', 'r41', 'r42', 'r60']),
   },
 ]
 

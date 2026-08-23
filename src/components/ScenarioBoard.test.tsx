@@ -20,4 +20,20 @@ describe('ScenarioBoard', () => {
     expect(screen.getByTestId('sail-B')).toHaveAttribute('data-sail-side', 'port')
     expect(screen.getByTestId('sail-B')).toHaveAttribute('d', 'M0 -10 L0 9 L-11 3 Z')
   })
+
+  it('障害物問題では防波堤と通過できる側を図示する', () => {
+    const diagram: ScenarioDiagram = {
+      windDirection: 'north',
+      obstruction: { x: 82, y: 50, width: 18, height: 72, label: '防波堤' },
+      boats: [
+        { id: 'A', label: '内側艇', x: 58, y: 58, heading: 0, tack: 'starboard' },
+        { id: 'B', label: '外側艇', x: 35, y: 58, heading: 0, tack: 'starboard' },
+      ],
+    }
+
+    render(<ScenarioBoard diagram={diagram} />)
+
+    expect(screen.getByRole('img', { name: /防波堤/ })).toBeInTheDocument()
+    expect(screen.getByText('防波堤')).toBeInTheDocument()
+  })
 })

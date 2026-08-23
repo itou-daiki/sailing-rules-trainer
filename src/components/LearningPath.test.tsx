@@ -8,7 +8,7 @@ import { LearningPath } from './LearningPath'
 afterEach(cleanup)
 
 describe('練習コース一覧', () => {
-  it('6つのレッスンを、内容が異なる艇図と一緒に案内する', () => {
+  it('9つのレッスンを、内容が異なる艇図と一緒に案内する', () => {
     render(
       <LearningPath
         progress={createEmptyProgress()}
@@ -26,6 +26,10 @@ describe('練習コース一覧', () => {
         }),
       ).toBeInTheDocument()
     }
+    expect(learningCourses).toHaveLength(9)
+    expect(screen.getByRole('heading', { name: '違反した、その後' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '障害物と安全' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '公正に走る' })).toBeInTheDocument()
   })
 
   it('艇図の横から選んだコースを開始できる', () => {

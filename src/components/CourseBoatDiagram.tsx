@@ -124,6 +124,51 @@ const MarkScene = ({ arrowId }: { arrowId: string }) => (
   </>
 )
 
+const PenaltyScene = ({ arrowId }: { arrowId: string }) => (
+  <>
+    <Wind />
+    <path d="M83 119 C45 111 42 61 81 54 C118 48 131 89 104 112" markerEnd={`url(#${arrowId})`} className="course-boat-art__route" />
+    <Boat x={82} y={87} heading={76} scale={0.66} tack="port" />
+    <Boat x={174} y={54} heading={-7} scale={0.5} tack="starboard" />
+    <path d="M129 32 V127" className="course-boat-art__clear-line" />
+    <text x="140" y="119" className="course-boat-art__note">まず離れる</text>
+    <text x="21" y="23" className="course-boat-art__callout">1 / 2 TURNS</text>
+  </>
+)
+
+const ObstructionScene = ({ arrowId }: { arrowId: string }) => (
+  <>
+    <Wind />
+    <path d="M183 30 H220 V150 H183Z" className="course-boat-art__breakwater" />
+    <path d="M185 34l31 18 M185 52l31 18 M185 70l31 18 M185 88l31 18 M185 106l31 18 M185 124l31 18" className="course-boat-art__breakwater-lines" />
+    <text x="202" y="23" textAnchor="middle" className="course-boat-art__note">防波堤</text>
+    <path d="M145 130 V48" markerEnd={`url(#${arrowId})`} className="course-boat-art__route" />
+    <path d="M96 130 V48" markerEnd={`url(#${arrowId})`} className="course-boat-art__route is-muted" />
+    <Boat x={145} y={94} scale={0.62} tack="starboard" label="内側" />
+    <Boat x={96} y={103} scale={0.62} tack="starboard" label="外側" />
+    <path d="M162 74 H180 M162 70v8 M180 70v8" className="course-boat-art__measure" />
+    <text x="171" y="66" textAnchor="middle" className="course-boat-art__callout">ROOM</text>
+  </>
+)
+
+const FairScene = ({ arrowId }: { arrowId: string }) => (
+  <>
+    <Wind />
+    <path d="M39 121 L104 34 L169 112" className="course-boat-art__course" />
+    <CourseMark x={104} y={34} />
+    <path d="M55 116 C69 89 83 66 99 47" markerEnd={`url(#${arrowId})`} className="course-boat-art__route" />
+    <Boat x={67} y={96} heading={25} scale={0.62} tack="starboard" />
+    <path d="M33 78q-13 9 0 18 M31 76l-6 2 4 5 M31 99l-6-2 4-5" className="course-boat-art__motion" />
+    <path d="M24 72 L40 103" className="course-boat-art__stop" />
+    <g transform="translate(146 37)">
+      <path d="M0 0V31" className="course-boat-art__signal-pole" />
+      <path d="M2 2H24V17H2Z" className="course-boat-art__protest-flag" />
+      <text x="12" y="42" textAnchor="middle" className="course-boat-art__note">手続</text>
+    </g>
+    <text x="128" y="119" className="course-boat-art__callout">WIND + WATER</text>
+  </>
+)
+
 const RaceScene = ({ arrowId }: { arrowId: string }) => (
   <>
     <Wind />
@@ -143,6 +188,9 @@ const scenes: Record<CourseArtworkKind, (arrowId: string) => ReactNode> = {
   meeting: (arrowId) => <MeetingScene arrowId={arrowId} />,
   room: (arrowId) => <RoomScene arrowId={arrowId} />,
   mark: (arrowId) => <MarkScene arrowId={arrowId} />,
+  penalty: (arrowId) => <PenaltyScene arrowId={arrowId} />,
+  obstruction: (arrowId) => <ObstructionScene arrowId={arrowId} />,
+  fair: (arrowId) => <FairScene arrowId={arrowId} />,
   race: (arrowId) => <RaceScene arrowId={arrowId} />,
 }
 

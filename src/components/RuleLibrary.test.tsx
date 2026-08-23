@@ -32,5 +32,8 @@ describe('ルール解説', () => {
     expect(screen.getByText('6つの用語をやさしく確認').closest('details')).not.toHaveAttribute('open')
     expect(screen.getByText('反対タック').closest('details')).not.toHaveAttribute('open')
     expect(screen.getByText('「自艇が当たらない」だけではない').closest('details')).not.toHaveAttribute('open')
+    expect(screen.getByText('障害物を通過するルーム').closest('details')).not.toHaveAttribute('open')
+    expect(screen.getByText('違反時のペナルティー').closest('details')).not.toHaveAttribute('open')
+    expect(screen.getByText('推進方法').closest('details')).not.toHaveAttribute('open')
   })
 })

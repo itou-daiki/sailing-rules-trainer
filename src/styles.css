@@ -2626,6 +2626,21 @@ a {
   stroke-width: 1.2;
 }
 
+.scenario-board__obstruction rect {
+  fill: #d7d1c4;
+  stroke: #0b2942;
+  stroke-width: 1.2;
+  stroke-dasharray: 1.5 1.5;
+}
+
+.scenario-board__obstruction text {
+  fill: #0b2942;
+  font-family: var(--font-sans);
+  font-size: 4px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
 .scenario-board__boom {
   fill: none;
   stroke: var(--navy);
@@ -3338,6 +3353,43 @@ a {
   stroke: var(--navy);
   stroke-width: 1.8;
   vector-effect: non-scaling-stroke;
+}
+
+.course-boat-art__clear-line {
+  fill: none;
+  stroke: rgba(11, 41, 66, 0.45);
+  stroke-dasharray: 4 4;
+  stroke-width: 1.4;
+}
+
+.course-boat-art__breakwater {
+  fill: #d7d1c4;
+  stroke: #0b2942;
+  stroke-width: 1.5;
+}
+
+.course-boat-art__breakwater-lines {
+  fill: none;
+  stroke: rgba(11, 41, 66, 0.42);
+  stroke-width: 1;
+}
+
+.course-boat-art__motion {
+  fill: none;
+  stroke: #c93627;
+  stroke-width: 1.8;
+}
+
+.course-boat-art__stop {
+  fill: none;
+  stroke: #c93627;
+  stroke-width: 2.8;
+}
+
+.course-boat-art__protest-flag {
+  fill: #c93627;
+  stroke: #0b2942;
+  stroke-width: 1;
 }
 
 .course-boat-art__mast {

@@ -111,14 +111,14 @@ describe('learningEngine', () => {
     expect(selected.some((question) => !progress.answers[question.id])).toBe(true)
   })
 
-  it('診断では6領域から1問ずつ選ぶ', () => {
+  it('診断では9領域から1問ずつ選ぶ', () => {
     const selected = selectPracticeQuestions(quizQuestions, createEmptyProgress(), {
-      size: 6,
+      size: 9,
       seed: 'diagnostic',
       diagnostic: true,
     })
 
-    expect(selected).toHaveLength(6)
+    expect(selected).toHaveLength(9)
     expect(new Set(selected.map((question) => question.skill)).size).toBe(skillDefinitions.length)
   })
 

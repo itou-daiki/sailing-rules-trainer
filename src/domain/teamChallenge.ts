@@ -6,6 +6,9 @@ const COURSE_ALIASES = {
   RW: 'boats-meet',
   LM: 'right-with-limits',
   MR: 'mark-room',
+  PT: 'after-incident',
+  OB: 'obstacles-safety',
+  FR: 'fair-racing',
   RC: 'race-ready',
 } as const
 

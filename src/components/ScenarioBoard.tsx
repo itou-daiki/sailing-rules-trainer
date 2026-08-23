@@ -41,7 +41,7 @@ export function ScenarioBoard({ diagram }: ScenarioBoardProps) {
     <figure className="scenario-board">
       <svg
         role="img"
-        aria-label={`問題の艇の位置関係${diagram.mark?.zone ? '。破線の円は3艇身ゾーン' : ''}`}
+        aria-label={`問題の艇の位置関係${diagram.mark?.zone ? '。破線の円は3艇身ゾーン' : ''}${diagram.obstruction ? `。${diagram.obstruction.label}は通過できない障害物` : ''}`}
         viewBox="0 0 100 100"
       >
         <rect width="100" height="100" className="scenario-board__water" />
@@ -56,6 +56,26 @@ export function ScenarioBoard({ diagram }: ScenarioBoardProps) {
         ) : null}
         {diagram.path ? (
           <path d={diagram.path.d} className="scenario-board__path" aria-hidden="true" />
+        ) : null}
+        {diagram.obstruction ? (
+          <g className="scenario-board__obstruction">
+            <rect
+              x={diagram.obstruction.x - diagram.obstruction.width / 2}
+              y={diagram.obstruction.y - diagram.obstruction.height / 2}
+              width={diagram.obstruction.width}
+              height={diagram.obstruction.height}
+            />
+            <text
+              x={diagram.obstruction.x}
+              y={diagram.obstruction.y}
+              textAnchor="middle"
+              transform={diagram.obstruction.height > diagram.obstruction.width
+                ? `rotate(90 ${diagram.obstruction.x} ${diagram.obstruction.y})`
+                : undefined}
+            >
+              {diagram.obstruction.label}
+            </text>
+          </g>
         ) : null}
         {diagram.mark ? (
           <g transform={`translate(${diagram.mark.x} ${diagram.mark.y})`}>

@@ -1,6 +1,15 @@
 import type { SkillId } from './content'
 
-export type CourseArtworkKind = 'signals' | 'start' | 'meeting' | 'room' | 'mark' | 'race'
+export type CourseArtworkKind =
+  | 'signals'
+  | 'start'
+  | 'meeting'
+  | 'room'
+  | 'mark'
+  | 'penalty'
+  | 'obstruction'
+  | 'fair'
+  | 'race'
 
 export interface LearningCourse {
   id: string
@@ -77,8 +86,44 @@ export const learningCourses: LearningCourse[] = [
     questionCount: 6,
   },
   {
-    id: 'race-ready',
+    id: 'after-incident',
     order: 6,
+    code: 'ACTION 01',
+    title: '違反した、その後',
+    shortDescription: 'マーク接触、回転、リタイア、免罪',
+    outcome: '違反直後に、安全で正しい次の行動を選べる。',
+    artwork: 'penalty',
+    artworkCaption: 'まず離れる → 回転かリタイアを選ぶ',
+    skills: ['penalties'],
+    questionCount: 6,
+  },
+  {
+    id: 'obstacles-safety',
+    order: 7,
+    code: 'WATER 04',
+    title: '障害物と安全',
+    shortDescription: '防波堤、タックの声かけ、戻る艇、救助',
+    outcome: '危険な場面で、航路権より先に必要な行動を選べる。',
+    artwork: 'obstruction',
+    artworkCaption: '危険を見つける → ルームと声を使う',
+    skills: ['obstructions-safety'],
+    questionCount: 6,
+  },
+  {
+    id: 'fair-racing',
+    order: 8,
+    code: 'RACE 01',
+    title: '公正に走る',
+    shortDescription: '正しいコース、外部援助、推進、抗議',
+    outcome: '速さと公正さがぶつかる場面で、正しい線を引ける。',
+    artwork: 'fair',
+    artworkCaption: '動作の目的を見る → 手続まで終える',
+    skills: ['race-conduct'],
+    questionCount: 6,
+  },
+  {
+    id: 'race-ready',
+    order: 9,
     code: 'RACE CHECK',
     title: 'レース前チェック',
     shortDescription: '信号旗と規則を混ぜた実戦確認',
@@ -92,8 +137,11 @@ export const learningCourses: LearningCourse[] = [
       'right-of-way',
       'rule-limitations',
       'mark-room',
+      'penalties',
+      'obstructions-safety',
+      'race-conduct',
     ],
-    questionCount: 8,
+    questionCount: 9,
   },
 ]
 

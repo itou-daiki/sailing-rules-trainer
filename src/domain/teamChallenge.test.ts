@@ -35,6 +35,13 @@ describe('teamChallenge', () => {
     expect(() => createTeamChallengeCode('unknown')).toThrow('Unknown course')
   })
 
+  it('追加した重要ルール3コースも共有コードへ変換できる', () => {
+    expect(createTeamChallengeCode('after-incident', () => new Uint8Array(6)))
+      .toBe('PT-AAAAAA')
+    expect(parseTeamChallengeCode('OB-ABC234')?.courseId).toBe('obstacles-safety')
+    expect(parseTeamChallengeCode('FR-ABC234')?.courseId).toBe('fair-racing')
+  })
+
   it('GitHub Pagesのパスを保った共有URLを作り、ハッシュからコードを読む', () => {
     const url = buildTeamChallengeUrl(
       'https://itou-daiki.github.io/sailing-rules-trainer/#/home',

@@ -1,5 +1,6 @@
 import { useId, type ReactNode } from 'react'
 import type { CourseArtworkKind } from '../data/courses'
+import { PlanViewDinghy } from './PlanViewDinghy'
 
 interface BoatProps {
   x: number
@@ -11,24 +12,15 @@ interface BoatProps {
 }
 
 const Boat = ({ x, y, heading = 0, scale = 1, tack, label }: BoatProps) => {
-  const isPort = tack === 'port'
-  const sailX = isPort ? 18 : -18
-
   return (
-    <g transform={`translate(${x} ${y}) rotate(${heading}) scale(${scale})`}>
-      <path
-        d="M0 -27 C10 -19 11 16 0 29 C-11 16 -10 -19 0 -27Z"
-        className="course-boat-art__hull"
-      />
-      <path d={`M0 -17 L0 19 L${sailX} 8 Z`} className={`course-boat-art__sail is-${tack}`} />
-      <path d={`M0 -8 L${sailX * 0.86} 8`} className="course-boat-art__boom" />
-      <circle cx="0" cy="-8" r="2.2" className="course-boat-art__mast" />
+    <>
+      <PlanViewDinghy tack={tack} x={x} y={y} heading={heading} scale={scale} />
       {label ? (
-        <text x="0" y="42" textAnchor="middle" className="course-boat-art__boat-label">
+        <text x={x} y={y + 42 * scale} textAnchor="middle" className="course-boat-art__boat-label">
           {label}
         </text>
       ) : null}
-    </g>
+    </>
   )
 }
 

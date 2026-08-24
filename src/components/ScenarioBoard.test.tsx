@@ -15,10 +15,10 @@ describe('ScenarioBoard', () => {
 
     render(<ScenarioBoard diagram={diagram} />)
 
+    expect(screen.getByTestId('A')).toHaveAttribute('data-model', 'plan-view-dinghy')
+    expect(screen.getByTestId('B')).toHaveAttribute('data-model', 'plan-view-dinghy')
     expect(screen.getByTestId('sail-A')).toHaveAttribute('data-sail-side', 'starboard')
-    expect(screen.getByTestId('sail-A')).toHaveAttribute('d', 'M0 -10 L0 9 L11 3 Z')
     expect(screen.getByTestId('sail-B')).toHaveAttribute('data-sail-side', 'port')
-    expect(screen.getByTestId('sail-B')).toHaveAttribute('d', 'M0 -10 L0 9 L-11 3 Z')
   })
 
   it('障害物問題では防波堤と通過できる側を図示する', () => {

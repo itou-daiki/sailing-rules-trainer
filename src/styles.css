@@ -2582,6 +2582,16 @@ a {
   fill: var(--navy);
 }
 
+.scenario-board__boat-badge {
+  fill: #fff;
+  stroke: var(--blue);
+  stroke-width: 1.3;
+}
+
+.scenario-board__boat-badge.is-port {
+  stroke: var(--red);
+}
+
 .scenario-board__wind-label {
   font-size: 5px;
   font-weight: 800;
@@ -2639,13 +2649,6 @@ a {
   font-size: 4px;
   font-weight: 800;
   letter-spacing: 0.08em;
-}
-
-.scenario-board__boom {
-  fill: none;
-  stroke: var(--navy);
-  stroke-linecap: round;
-  stroke-width: 1.2;
 }
 
 .session-result,
@@ -3321,30 +3324,106 @@ a {
   stroke-dasharray: 2 5;
 }
 
-.course-boat-art__hull {
-  fill: #fff;
+.plan-dinghy {
+  --dinghy-tack: var(--blue);
+}
+
+.plan-dinghy.is-port {
+  --dinghy-tack: var(--red);
+}
+
+.plan-dinghy__hull {
+  fill: #fffefa;
   stroke: var(--navy);
+  stroke-width: 1.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-dinghy__foredeck {
+  fill: #d8e7e8;
+  stroke: var(--navy);
+  stroke-width: 0.9;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-dinghy__cockpit {
+  fill: #9ebfc3;
+  stroke: var(--navy);
+  stroke-width: 0.9;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-dinghy__centreline,
+.plan-dinghy__sail-seam {
+  fill: none;
+  stroke: rgb(11 41 66 / 42%);
+  stroke-width: 0.7;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-dinghy__centreboard {
+  fill: #f6c949;
+  stroke: var(--navy);
+  stroke-width: 0.7;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-dinghy__rudder,
+.plan-dinghy__tiller,
+.plan-dinghy__boom {
+  fill: none;
+  stroke: var(--navy);
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-dinghy__rudder {
+  stroke-width: 2.6;
+}
+
+.plan-dinghy__tiller {
+  stroke-width: 1.2;
+}
+
+.plan-dinghy__sail {
+  fill: rgb(255 255 255 / 88%);
+  stroke: var(--dinghy-tack);
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-dinghy__sail-seam {
+  stroke: var(--dinghy-tack);
+  stroke-dasharray: 1.5 1.5;
+}
+
+.plan-dinghy__boom {
   stroke-width: 2.2;
-  vector-effect: non-scaling-stroke;
 }
 
-.course-boat-art__sail {
+.plan-dinghy__mast {
+  fill: var(--navy);
   stroke: #fff;
-  stroke-width: 1.3;
+  stroke-width: 0.8;
   vector-effect: non-scaling-stroke;
 }
 
-.course-boat-art__sail.is-port,
+.plan-dinghy__clew {
+  fill: var(--dinghy-tack);
+  stroke: #fff;
+  stroke-width: 0.6;
+  vector-effect: non-scaling-stroke;
+}
+
 .course-boat-art__key .is-port {
   fill: var(--red);
 }
 
-.course-boat-art__sail.is-starboard,
 .course-boat-art__key .is-starboard {
   fill: var(--blue);
 }
 
-.course-boat-art__boom,
 .course-boat-art__signal-pole,
 .course-boat-art__wind path,
 .course-boat-art__clock path,
@@ -3390,10 +3469,6 @@ a {
   fill: #c93627;
   stroke: #0b2942;
   stroke-width: 1;
-}
-
-.course-boat-art__mast {
-  fill: var(--navy);
 }
 
 .course-boat-art__boat-label,
@@ -4584,57 +4659,6 @@ a {
   margin: 0 auto;
 }
 
-.tack-boat__hull {
-  fill: #f9fbfa;
-  stroke: var(--navy);
-  stroke-width: 2.4;
-  vector-effect: non-scaling-stroke;
-}
-
-.tack-boat__centerline {
-  fill: none;
-  stroke: #8aa2a7;
-  stroke-width: 1;
-  stroke-dasharray: 3 4;
-  vector-effect: non-scaling-stroke;
-}
-
-.tack-boat__cockpit {
-  fill: #dcebed;
-  stroke: var(--navy);
-  stroke-width: 1.5;
-  vector-effect: non-scaling-stroke;
-}
-
-.tack-boat__sail {
-  stroke: #fff;
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
-}
-
-.tack-boat__sail.is-port {
-  fill: var(--red);
-}
-
-.tack-boat__sail.is-starboard {
-  fill: var(--blue);
-}
-
-.tack-boat__boom {
-  fill: none;
-  stroke: var(--navy);
-  stroke-linecap: round;
-  stroke-width: 3;
-  vector-effect: non-scaling-stroke;
-}
-
-.tack-boat__mast {
-  fill: var(--yellow);
-  stroke: var(--navy);
-  stroke-width: 1.5;
-  vector-effect: non-scaling-stroke;
-}
-
 .tack-boat__course-line {
   fill: none;
   stroke: var(--sea);
@@ -4653,11 +4677,23 @@ a {
   vector-effect: non-scaling-stroke;
 }
 
-.tack-boat__side-label {
+.tack-boat__bow-pointer {
+  fill: none;
+  stroke: var(--sea);
+  stroke-width: 1.2;
+}
+
+.tack-boat__side-label,
+.tack-boat__bow-label {
   fill: var(--navy);
   font-family: "SFMono-Regular", Consolas, monospace;
   font-size: 10px;
   font-weight: 900;
+}
+
+.tack-boat__bow-label {
+  fill: var(--sea);
+  font-size: 8px;
 }
 
 .tack-boat figcaption {

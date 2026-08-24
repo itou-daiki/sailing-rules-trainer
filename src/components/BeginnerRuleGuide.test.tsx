@@ -17,14 +17,18 @@ describe('初心者向けタック図', () => {
       name: '風を右舷側から受け、帆が左舷側にあるスターボードタック艇',
     })
 
-    expect(portBoat.querySelector('.tack-boat__sail')).toHaveAttribute(
-      'd',
-      expect.stringContaining('L145 116'),
+    expect(portBoat.querySelector('[data-model="plan-view-dinghy"]')).toBeInTheDocument()
+    expect(starboardBoat.querySelector('[data-model="plan-view-dinghy"]')).toBeInTheDocument()
+    expect(portBoat.querySelector('[data-boat-part="mainsail"]')).toHaveAttribute(
+      'data-sail-side',
+      'starboard',
     )
-    expect(starboardBoat.querySelector('.tack-boat__sail')).toHaveAttribute(
-      'd',
-      expect.stringContaining('L55 116'),
+    expect(starboardBoat.querySelector('[data-boat-part="mainsail"]')).toHaveAttribute(
+      'data-sail-side',
+      'port',
     )
+    expect(portBoat.querySelector('[data-boat-part="cockpit"]')).toBeInTheDocument()
+    expect(portBoat.querySelector('[data-boat-part="rudder"]')).toBeInTheDocument()
   })
 
   it('図の下から状況問題へ進める', () => {

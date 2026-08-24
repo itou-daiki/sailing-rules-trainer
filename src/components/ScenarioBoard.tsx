@@ -1,4 +1,5 @@
 import type { BoatPosition, ScenarioDiagram } from '../data/content'
+import { PlanViewDinghy } from './PlanViewDinghy'
 
 interface ScenarioBoardProps {
   diagram: ScenarioDiagram
@@ -12,27 +13,23 @@ const windRotation: Record<ScenarioDiagram['windDirection'], number> = {
 }
 
 const Boat = ({ boat }: { boat: BoatPosition }) => {
-  const color = boat.tack === 'port' ? '#c93627' : '#155b9a'
-  const sailX = boat.tack === 'port' ? 11 : -11
-  const sailSide = boat.tack === 'port' ? 'starboard' : 'port'
   return (
-    <g transform={`translate(${boat.x} ${boat.y}) rotate(${boat.heading})`}>
-      <path d="M0 -13 C7 -7 8 9 0 14 C-8 9 -7 -7 0 -13Z" fill="#f8f7f1" stroke="#0b2942" />
-      <path
-        d={`M0 -10 L0 9 L${sailX} 3 Z`}
-        fill={color}
-        opacity="0.92"
-        stroke="#0b2942"
-        strokeWidth="0.8"
-        data-testid={`sail-${boat.id}`}
-        data-sail-side={sailSide}
+    <>
+      <PlanViewDinghy
+        tack={boat.tack}
+        x={boat.x}
+        y={boat.y}
+        heading={boat.heading}
+        scale={0.5}
+        testId={boat.id}
       />
-      <path d={`M0 0 L${sailX} 3`} className="scenario-board__boom" aria-hidden="true" />
-      <circle cx="0" cy="0" r="8" fill="none" stroke={color} strokeWidth="2" />
-      <text x="0" y="3" textAnchor="middle" className="scenario-board__boat-id">
-        {boat.id}
-      </text>
-    </g>
+      <g transform={`translate(${boat.x} ${boat.y}) rotate(${boat.heading})`}>
+        <circle cy="-19" r="4" className={`scenario-board__boat-badge is-${boat.tack}`} />
+        <text x="0" y="-17.4" textAnchor="middle" className="scenario-board__boat-id">
+          {boat.id}
+        </text>
+      </g>
+    </>
   )
 }
 
@@ -107,8 +104,8 @@ export function ScenarioBoard({ diagram }: ScenarioBoardProps) {
         })}
       </svg>
       <figcaption>
-        <span>ポートタック（赤）：帆は右舷側</span>
-        <span>スターボードタック（青）：帆は左舷側</span>
+        <span>ポートタック（赤い縁）：帆は右舷側</span>
+        <span>スターボードタック（青い縁）：帆は左舷側</span>
       </figcaption>
     </figure>
   )

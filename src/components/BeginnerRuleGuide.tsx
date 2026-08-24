@@ -1,7 +1,9 @@
+import { PlanViewDinghy } from './PlanViewDinghy'
+
 const TackBoat = ({ tack }: { tack: 'port' | 'starboard' }) => {
   const isPort = tack === 'port'
-  const sailX = isPort ? 145 : 55
-  const labelX = isPort ? 157 : 43
+  const side = isPort ? 1 : -1
+  const labelX = 100 + side * 62
   const rotation = isPort ? 27 : -27
   const name = isPort ? 'ポートタック' : 'スターボードタック'
   const sideLabel = isPort ? '右舷側' : '左舷側'
@@ -17,19 +19,13 @@ const TackBoat = ({ tack }: { tack: 'port' | 'starboard' }) => {
         <g transform={`rotate(${rotation} 100 108)`}>
           <path d="M100 190 V18" className="tack-boat__course-line" />
           <path d="m100 12-7 12h14Z" className="tack-boat__course-arrow" />
-          <path
-            d="M100 24 C122 42 124 142 100 174 C76 142 78 42 100 24Z"
-            className="tack-boat__hull"
-          />
-          <path d="M100 31 V168" className="tack-boat__centerline" />
-          <path d="M88 103 C88 89 112 89 112 103 V143 C112 156 88 156 88 143Z" className="tack-boat__cockpit" />
-          <path d={`M100 48 L100 139 L${sailX} 116Z`} className={`tack-boat__sail is-${tack}`} />
-          <path d={`M100 82 L${isPort ? 140 : 60} 116`} className="tack-boat__boom" />
-          <circle cx="100" cy="82" r="4" className="tack-boat__mast" />
-          <path d={`M${isPort ? 121 : 79} 111 H${isPort ? 151 : 49}`} className="tack-boat__sail-pointer" />
-          <text x={labelX} y="108" textAnchor="middle" className="tack-boat__side-label">
-            帆
+          <PlanViewDinghy tack={tack} x={100} y={102} scale={2.15} />
+          <path d={`M${100 + side * 28} 133 H${100 + side * 54}`} className="tack-boat__sail-pointer" />
+          <text x={labelX} y="130" textAnchor="middle" className="tack-boat__side-label">
+            帆・ブーム
           </text>
+          <path d="M100 27 V36" className="tack-boat__bow-pointer" />
+          <text x="100" y="22" textAnchor="middle" className="tack-boat__bow-label">船首</text>
         </g>
       </svg>
       <figcaption>

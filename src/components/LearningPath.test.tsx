@@ -63,11 +63,13 @@ describe('練習コース一覧', () => {
     const diagram = screen
       .getByRole('img', { name: /艇が出会うときの艇図/ })
       .closest('.course-boat-art')
-    const portSail = diagram?.querySelector('.course-boat-art__sail.is-port')
-    const starboardSail = diagram?.querySelector('.course-boat-art__sail.is-starboard')
+    const boats = diagram?.querySelectorAll('[data-model="plan-view-dinghy"]')
+    const portSail = diagram?.querySelector('[data-tack="port"] [data-boat-part="mainsail"]')
+    const starboardSail = diagram?.querySelector('[data-tack="starboard"] [data-boat-part="mainsail"]')
 
-    expect(portSail).toHaveAttribute('d', expect.stringContaining('L18 8'))
-    expect(starboardSail).toHaveAttribute('d', expect.stringContaining('L-18 8'))
+    expect(boats).toHaveLength(2)
+    expect(portSail).toHaveAttribute('data-sail-side', 'starboard')
+    expect(starboardSail).toHaveAttribute('data-sail-side', 'port')
   })
 
   it('中級者はヒントなしで判断するケースへ進める', () => {

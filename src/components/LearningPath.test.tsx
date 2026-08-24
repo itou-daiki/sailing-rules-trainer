@@ -11,6 +11,7 @@ describe('練習コース一覧', () => {
   it('9つのレッスンを、内容が異なる艇図と一緒に案内する', () => {
     render(
       <LearningPath
+        boatClass="420"
         progress={createEmptyProgress()}
         questions={quizQuestions}
         onDiagnostic={vi.fn()}
@@ -36,6 +37,7 @@ describe('練習コース一覧', () => {
     const onStartCourse = vi.fn()
     render(
       <LearningPath
+        boatClass="420"
         progress={createEmptyProgress()}
         questions={quizQuestions}
         onDiagnostic={vi.fn()}
@@ -52,6 +54,7 @@ describe('練習コース一覧', () => {
   it('反対タックの艇図はポート艇の帆を右、スターボード艇の帆を左に描く', () => {
     render(
       <LearningPath
+        boatClass="470"
         progress={createEmptyProgress()}
         questions={quizQuestions}
         onDiagnostic={vi.fn()}
@@ -68,6 +71,10 @@ describe('練習コース一覧', () => {
     const starboardSail = diagram?.querySelector('[data-tack="starboard"] [data-boat-part="mainsail"]')
 
     expect(boats).toHaveLength(2)
+    for (const boat of boats ?? []) {
+      expect(boat).toHaveAttribute('data-boat-class', '470')
+      expect(boat.querySelector('[data-boat-part="jib"]')).toBeInTheDocument()
+    }
     expect(portSail).toHaveAttribute('data-sail-side', 'starboard')
     expect(starboardSail).toHaveAttribute('data-sail-side', 'port')
   })
@@ -76,6 +83,7 @@ describe('練習コース一覧', () => {
     const onStartIntermediate = vi.fn()
     render(
       <LearningPath
+        boatClass="420"
         progress={createEmptyProgress()}
         questions={quizQuestions}
         onDiagnostic={vi.fn()}

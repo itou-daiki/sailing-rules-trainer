@@ -13,10 +13,13 @@ describe('ScenarioBoard', () => {
       ],
     }
 
-    render(<ScenarioBoard diagram={diagram} />)
+    render(<ScenarioBoard boatClass="470" diagram={diagram} />)
 
     expect(screen.getByTestId('A')).toHaveAttribute('data-model', 'plan-view-dinghy')
     expect(screen.getByTestId('B')).toHaveAttribute('data-model', 'plan-view-dinghy')
+    expect(screen.getByTestId('A')).toHaveAttribute('data-boat-class', '470')
+    expect(screen.getByTestId('jib-A')).toHaveAttribute('data-sail-side', 'starboard')
+    expect(screen.getByTestId('jib-B')).toHaveAttribute('data-sail-side', 'port')
     expect(screen.getByTestId('sail-A')).toHaveAttribute('data-sail-side', 'starboard')
     expect(screen.getByTestId('sail-B')).toHaveAttribute('data-sail-side', 'port')
   })
@@ -31,7 +34,7 @@ describe('ScenarioBoard', () => {
       ],
     }
 
-    render(<ScenarioBoard diagram={diagram} />)
+    render(<ScenarioBoard boatClass="420" diagram={diagram} />)
 
     expect(screen.getByRole('img', { name: /防波堤/ })).toBeInTheDocument()
     expect(screen.getByText('防波堤')).toBeInTheDocument()

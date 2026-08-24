@@ -33,6 +33,11 @@ import {
   teamChallengeCodeFromHash,
   type TeamChallengeData,
 } from './domain/teamChallenge'
+import {
+  loadBoatClass,
+  saveBoatClass,
+  type BoatClass,
+} from './domain/boatClass'
 
 type Page = 'home' | 'learn' | 'signals' | 'rules' | 'progress' | 'practice' | 'team'
 type ReasoningOrder = 'observe-first' | 'decide-first'
@@ -97,9 +102,18 @@ const loadInitialProgress = (): LearningProgress => {
   }
 }
 
+const loadInitialBoatClass = (): BoatClass => {
+  try {
+    return loadBoatClass(window.localStorage)
+  } catch {
+    return '420'
+  }
+}
+
 export default function App() {
   const [page, setPage] = useState<Page>(pageFromHash)
   const [progress, setProgress] = useState<LearningProgress>(loadInitialProgress)
+  const [boatClass, setBoatClass] = useState<BoatClass>(loadInitialBoatClass)
   const [sessionConfig, setSessionConfig] = useState<SessionConfig>(dailySession)
   const [sessionQuestions, setSessionQuestions] = useState<QuizQuestion[]>(() =>
     selectPracticeQuestions(quizQuestions, loadInitialProgress(), { size: 5 }),
@@ -116,6 +130,15 @@ export default function App() {
   const navigate = (nextPage: Exclude<Page, 'practice'>) => {
     window.location.hash = nextPage === 'home' ? '#/' : `#/${nextPage}`
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleBoatClassChange = (nextBoatClass: BoatClass) => {
+    setBoatClass(nextBoatClass)
+    try {
+      saveBoatClass(window.localStorage, nextBoatClass)
+    } catch {
+      // The model still changes for this visit when storage is unavailable.
+    }
   }
 
   const beginSession = (config: SessionConfig, retry = false) => {
@@ -291,6 +314,7 @@ export default function App() {
         ) : null}
         {page === 'learn' ? (
           <LearningPath
+            boatClass={boatClass}
             progress={progress}
             questions={quizQuestions}
             onDiagnostic={startDiagnostic}
@@ -299,7 +323,13 @@ export default function App() {
           />
         ) : null}
         {page === 'signals' ? <SignalLibrary onPractice={() => startPractice('signal')} /> : null}
-        {page === 'rules' ? <RuleLibrary onPractice={() => startPractice('rule')} /> : null}
+        {page === 'rules' ? (
+          <RuleLibrary
+            boatClass={boatClass}
+            onBoatClassChange={handleBoatClassChange}
+            onPractice={() => startPractice('rule')}
+          />
+        ) : null}
         {page === 'progress' ? (
           <ProgressPage
             progress={progress}
@@ -318,6 +348,7 @@ export default function App() {
         ) : null}
         {page === 'practice' ? (
           <PracticeSession
+            boatClass={boatClass}
             key={sessionQuestions.map((question) => question.id).join(':')}
             questions={sessionQuestions}
             sessionLabel={sessionConfig.label}

@@ -1,7 +1,9 @@
 import type { BoatPosition, ScenarioDiagram } from '../data/content'
+import type { BoatClass } from '../domain/boatClass'
 import { PlanViewDinghy } from './PlanViewDinghy'
 
 interface ScenarioBoardProps {
+  boatClass: BoatClass
   diagram: ScenarioDiagram
 }
 
@@ -12,10 +14,11 @@ const windRotation: Record<ScenarioDiagram['windDirection'], number> = {
   west: 270,
 }
 
-const Boat = ({ boat }: { boat: BoatPosition }) => {
+const Boat = ({ boat, boatClass }: { boat: BoatPosition; boatClass: BoatClass }) => {
   return (
     <>
       <PlanViewDinghy
+        boatClass={boatClass}
         tack={boat.tack}
         x={boat.x}
         y={boat.y}
@@ -33,7 +36,7 @@ const Boat = ({ boat }: { boat: BoatPosition }) => {
   )
 }
 
-export function ScenarioBoard({ diagram }: ScenarioBoardProps) {
+export function ScenarioBoard({ boatClass, diagram }: ScenarioBoardProps) {
   return (
     <figure className="scenario-board">
       <svg
@@ -90,7 +93,7 @@ export function ScenarioBoard({ diagram }: ScenarioBoardProps) {
           const labelOnLeft = boat.x > 55 || (boat.x >= 45 && boat.x <= 55 && boat.id === 'B')
           return (
             <g key={boat.id}>
-              <Boat boat={boat} />
+              <Boat boat={boat} boatClass={boatClass} />
               <text
                 x={boat.x + (labelOnLeft ? -12 : 12)}
                 y={boat.y + 2}
@@ -104,6 +107,7 @@ export function ScenarioBoard({ diagram }: ScenarioBoardProps) {
         })}
       </svg>
       <figcaption>
+        <span>{boatClass}モデル</span>
         <span>ポートタック（赤い縁）：帆は右舷側</span>
         <span>スターボードタック（青い縁）：帆は左舷側</span>
       </figcaption>

@@ -5,9 +5,11 @@ import {
   type LearningProgress,
   type SkillStats,
 } from '../domain/learningEngine'
+import type { BoatClass } from '../domain/boatClass'
 import { CourseBoatDiagram } from './CourseBoatDiagram'
 
 interface LearningPathProps {
+  boatClass: BoatClass
   progress: LearningProgress
   questions: QuizQuestion[]
   onDiagnostic: () => void
@@ -22,6 +24,7 @@ const courseMastery = (course: LearningCourse, stats: SkillStats[]) => {
 }
 
 export function LearningPath({
+  boatClass,
   progress,
   questions,
   onDiagnostic,
@@ -97,6 +100,7 @@ export function LearningPath({
                 <small>{course.code}</small>
               </div>
               <CourseBoatDiagram
+                boatClass={boatClass}
                 kind={course.artwork}
                 title={course.title}
                 caption={course.artworkCaption}

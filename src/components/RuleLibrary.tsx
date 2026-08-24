@@ -1,4 +1,5 @@
 import { coreRules } from '../data/content'
+import type { BoatClass } from '../domain/boatClass'
 import { BeginnerRuleGuide } from './BeginnerRuleGuide'
 import { RuleEvolution } from './RuleEvolution'
 
@@ -49,7 +50,13 @@ const ruleGroups = [
   },
 ]
 
-export function RuleLibrary({ onPractice }: { onPractice: () => void }) {
+interface RuleLibraryProps {
+  boatClass: BoatClass
+  onBoatClassChange: (boatClass: BoatClass) => void
+  onPractice: () => void
+}
+
+export function RuleLibrary({ boatClass, onBoatClassChange, onPractice }: RuleLibraryProps) {
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView()
   }
@@ -84,7 +91,11 @@ export function RuleLibrary({ onPractice }: { onPractice: () => void }) {
         </div>
       </div>
 
-      <BeginnerRuleGuide onPractice={onPractice} />
+      <BeginnerRuleGuide
+        boatClass={boatClass}
+        onBoatClassChange={onBoatClassChange}
+        onPractice={onPractice}
+      />
 
       <section className="rule-basics" aria-labelledby="rule-basics-title">
         <header className="rule-basics__header">

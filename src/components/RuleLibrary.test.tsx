@@ -6,7 +6,13 @@ afterEach(cleanup)
 
 describe('ルール解説', () => {
   it('初心者ガイドと変更点へルール画面内で移動する', () => {
-    render(<RuleLibrary onPractice={vi.fn()} />)
+    render(
+      <RuleLibrary
+        boatClass="420"
+        onBoatClassChange={vi.fn()}
+        onPractice={vi.fn()}
+      />,
+    )
     const beginnerSection = document.getElementById('beginner-guide')
     const changesSection = document.getElementById('rule-changes')
     const beginnerScroll = vi.fn()
@@ -26,7 +32,13 @@ describe('ルール解説', () => {
   })
 
   it('専門用語と詳しい条件を最初は閉じておく', () => {
-    render(<RuleLibrary onPractice={vi.fn()} />)
+    render(
+      <RuleLibrary
+        boatClass="420"
+        onBoatClassChange={vi.fn()}
+        onPractice={vi.fn()}
+      />,
+    )
 
     expect(screen.getByText('規則番号より先に、3つだけ見る')).toBeInTheDocument()
     expect(screen.getByText('6つの用語をやさしく確認').closest('details')).not.toHaveAttribute('open')

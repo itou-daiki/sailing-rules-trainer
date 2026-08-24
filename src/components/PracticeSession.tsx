@@ -2,10 +2,12 @@ import { useState } from 'react'
 import type { QuizQuestion, SkillId } from '../data/content'
 import { getSignal } from '../data/content'
 import type { Confidence } from '../domain/learningEngine'
+import type { BoatClass } from '../domain/boatClass'
 import { FlagArtwork } from './FlagArtwork'
 import { ScenarioBoard } from './ScenarioBoard'
 
 interface PracticeSessionProps {
+  boatClass: BoatClass
   questions: QuizQuestion[]
   sessionLabel?: string
   diagnostic?: boolean
@@ -28,6 +30,7 @@ const confidenceOptions: Array<{ id: Confidence; label: string; note: string }> 
 ]
 
 export function PracticeSession({
+  boatClass,
   questions,
   sessionLabel = '今日の5問',
   diagnostic = false,
@@ -292,7 +295,7 @@ export function PracticeSession({
         </div>
         <h1 id="question-title">{question.prompt}</h1>
         {flag ? <FlagArtwork kind={flag.artwork} label={flag.name} /> : null}
-        {question.diagram ? <ScenarioBoard diagram={question.diagram} /> : null}
+        {question.diagram ? <ScenarioBoard boatClass={boatClass} diagram={question.diagram} /> : null}
 
         {observation && !decideFirst ? observationStep : null}
 

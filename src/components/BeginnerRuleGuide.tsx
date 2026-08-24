@@ -1,6 +1,7 @@
+import { BOAT_CLASS_SPECS, type BoatClass } from '../domain/boatClass'
 import { PlanViewDinghy } from './PlanViewDinghy'
 
-const TackBoat = ({ tack }: { tack: 'port' | 'starboard' }) => {
+const TackBoat = ({ boatClass, tack }: { boatClass: BoatClass; tack: 'port' | 'starboard' }) => {
   const isPort = tack === 'port'
   const side = isPort ? 1 : -1
   const labelX = 100 + side * 62
@@ -13,13 +14,13 @@ const TackBoat = ({ tack }: { tack: 'port' | 'starboard' }) => {
     <figure className="tack-boat">
       <svg
         role="img"
-        aria-label={`風を${windwardSide}から受け、帆が${sideLabel}にある${name}艇`}
+        aria-label={`${boatClass}艇。風を${windwardSide}から受け、帆が${sideLabel}にある${name}艇`}
         viewBox="0 0 200 205"
       >
         <g transform={`rotate(${rotation} 100 108)`}>
           <path d="M100 190 V18" className="tack-boat__course-line" />
           <path d="m100 12-7 12h14Z" className="tack-boat__course-arrow" />
-          <PlanViewDinghy tack={tack} x={100} y={102} scale={2.15} />
+          <PlanViewDinghy boatClass={boatClass} tack={tack} x={100} y={102} scale={2.15} />
           <path d={`M${100 + side * 28} 133 H${100 + side * 54}`} className="tack-boat__sail-pointer" />
           <text x={labelX} y="130" textAnchor="middle" className="tack-boat__side-label">
             帆・ブーム
@@ -75,7 +76,19 @@ const beginnerTerms = [
   },
 ]
 
-export function BeginnerRuleGuide({ onPractice }: { onPractice: () => void }) {
+interface BeginnerRuleGuideProps {
+  boatClass: BoatClass
+  onBoatClassChange: (boatClass: BoatClass) => void
+  onPractice: () => void
+}
+
+export function BeginnerRuleGuide({
+  boatClass,
+  onBoatClassChange,
+  onPractice,
+}: BeginnerRuleGuideProps) {
+  const boatSpec = BOAT_CLASS_SPECS[boatClass]
+
   return (
     <section className="beginner-guide" id="beginner-guide" aria-labelledby="beginner-title">
       <header className="beginner-guide__header">
@@ -112,15 +125,35 @@ export function BeginnerRuleGuide({ onPractice }: { onPractice: () => void }) {
           <span>最初のコツ</span>
           <h3>タック名は、帆がある側と反対</h3>
           <p>
-            艇がどちらから来たかではなく、メインセールとブームが艇のどちら側にあるかを見ます。
+            艇がどちらから来たかではなく、メインセールとブームが艇のどちら側にあるかを見ます。ジブだけでは決めません。
           </p>
           <p className="tack-reader__memory">右の帆＝ポート ／ 左の帆＝スターボード</p>
+          <fieldset className="boat-class-switch">
+            <legend>表示する艇</legend>
+            <div className="boat-class-switch__buttons">
+              {(['420', '470'] as const).map((candidate) => (
+                <button
+                  type="button"
+                  key={candidate}
+                  aria-label={`${candidate}を表示`}
+                  aria-pressed={candidate === boatClass}
+                  onClick={() => onBoatClassChange(candidate)}
+                >
+                  {candidate}
+                </button>
+              ))}
+            </div>
+            <p className="boat-class-switch__spec">
+              <strong>{boatSpec.name}</strong>
+              <span>{boatSpec.summary}</span>
+            </p>
+          </fieldset>
         </div>
         <div className="tack-reader__diagram">
           <TackWind />
           <div className="tack-reader__boats">
-            <TackBoat tack="port" />
-            <TackBoat tack="starboard" />
+            <TackBoat boatClass={boatClass} tack="port" />
+            <TackBoat boatClass={boatClass} tack="starboard" />
           </div>
         </div>
       </div>

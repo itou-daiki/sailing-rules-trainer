@@ -1,8 +1,10 @@
 import { useId, type ReactNode } from 'react'
 import type { CourseArtworkKind } from '../data/courses'
+import type { BoatClass } from '../domain/boatClass'
 import { PlanViewDinghy } from './PlanViewDinghy'
 
 interface BoatProps {
+  boatClass: BoatClass
   x: number
   y: number
   heading?: number
@@ -11,10 +13,10 @@ interface BoatProps {
   label?: string
 }
 
-const Boat = ({ x, y, heading = 0, scale = 1, tack, label }: BoatProps) => {
+const Boat = ({ boatClass, x, y, heading = 0, scale = 1, tack, label }: BoatProps) => {
   return (
     <>
-      <PlanViewDinghy tack={tack} x={x} y={y} heading={heading} scale={scale} />
+      <PlanViewDinghy boatClass={boatClass} tack={tack} x={x} y={y} heading={heading} scale={scale} />
       {label ? (
         <text x={x} y={y + 42 * scale} textAnchor="middle" className="course-boat-art__boat-label">
           {label}
@@ -44,7 +46,12 @@ const Wind = () => (
   </g>
 )
 
-const SignalScene = ({ arrowId }: { arrowId: string }) => (
+interface SceneProps {
+  arrowId: string
+  boatClass: BoatClass
+}
+
+const SignalScene = ({ arrowId, boatClass }: SceneProps) => (
   <>
     <Wind />
     <path d="M32 29 V118" className="course-boat-art__signal-pole" />
@@ -53,11 +60,11 @@ const SignalScene = ({ arrowId }: { arrowId: string }) => (
     <text x="18" y="130" className="course-boat-art__note">信号艇</text>
     <path d="M137 111 C110 99 84 78 64 57" markerEnd={`url(#${arrowId})`} className="course-boat-art__route" />
     <text x="86" y="103" className="course-boat-art__callout">見る</text>
-    <Boat x={154} y={101} heading={-20} scale={0.78} tack="starboard" />
+    <Boat boatClass={boatClass} x={154} y={101} heading={-20} scale={0.78} tack="starboard" />
   </>
 )
 
-const StartScene = ({ arrowId }: { arrowId: string }) => (
+const StartScene = ({ arrowId, boatClass }: SceneProps) => (
   <>
     <Wind />
     <path d="M28 60 H184" className="course-boat-art__start-line" />
@@ -65,7 +72,7 @@ const StartScene = ({ arrowId }: { arrowId: string }) => (
     <CourseMark x={181} y={60} />
     <text x="106" y="50" textAnchor="middle" className="course-boat-art__callout">START LINE</text>
     <path d="M106 125 C106 106 109 88 117 70" markerEnd={`url(#${arrowId})`} className="course-boat-art__route" />
-    <Boat x={103} y={112} heading={5} scale={0.76} tack="starboard" />
+    <Boat boatClass={boatClass} x={103} y={112} heading={5} scale={0.76} tack="starboard" />
     <g className="course-boat-art__clock">
       <text x="25" y="19">5</text><text x="47" y="19">4</text><text x="69" y="19">1</text><text x="91" y="19">0</text>
       <path d="M23 24 H98" />
@@ -73,13 +80,13 @@ const StartScene = ({ arrowId }: { arrowId: string }) => (
   </>
 )
 
-const MeetingScene = ({ arrowId }: { arrowId: string }) => (
+const MeetingScene = ({ arrowId, boatClass }: SceneProps) => (
   <>
     <Wind />
     <path d="M31 126 L100 54" markerEnd={`url(#${arrowId})`} className="course-boat-art__route" />
     <path d="M181 126 L111 54" markerEnd={`url(#${arrowId})`} className="course-boat-art__route" />
-    <Boat x={64} y={92} heading={45} scale={0.82} tack="port" />
-    <Boat x={148} y={92} heading={-45} scale={0.82} tack="starboard" />
+    <Boat boatClass={boatClass} x={64} y={92} heading={45} scale={0.82} tack="port" />
+    <Boat boatClass={boatClass} x={148} y={92} heading={-45} scale={0.82} tack="starboard" />
     <g className="course-boat-art__key">
       <circle cx="54" cy="133" r="7" className="is-port" />
       <text x="68" y="137">PORT</text>
@@ -89,21 +96,21 @@ const MeetingScene = ({ arrowId }: { arrowId: string }) => (
   </>
 )
 
-const RoomScene = ({ arrowId }: { arrowId: string }) => (
+const RoomScene = ({ arrowId, boatClass }: SceneProps) => (
   <>
     <Wind />
     <path d="M64 131 C65 103 76 78 100 50" markerEnd={`url(#${arrowId})`} className="course-boat-art__route" />
     <path d="M143 128 C142 98 139 78 136 47" markerEnd={`url(#${arrowId})`} className="course-boat-art__route is-muted" />
     <path d="M111 129 C110 103 112 79 125 55" className="course-boat-art__room" />
     <path d="M173 129 C172 101 164 77 148 54" className="course-boat-art__room" />
-    <Boat x={77} y={99} heading={13} scale={0.78} tack="starboard" />
-    <Boat x={143} y={86} heading={-4} scale={0.74} tack="port" />
+    <Boat boatClass={boatClass} x={77} y={99} heading={13} scale={0.78} tack="starboard" />
+    <Boat boatClass={boatClass} x={143} y={86} heading={-4} scale={0.74} tack="port" />
     <text x="156" y="116" textAnchor="middle" className="course-boat-art__callout">逃げ場</text>
     <path d="M126 121 H169" className="course-boat-art__measure" />
   </>
 )
 
-const MarkScene = ({ arrowId }: { arrowId: string }) => (
+const MarkScene = ({ arrowId, boatClass }: SceneProps) => (
   <>
     <Wind />
     <circle cx="111" cy="43" r="48" className="course-boat-art__zone" />
@@ -111,24 +118,24 @@ const MarkScene = ({ arrowId }: { arrowId: string }) => (
     <CourseMark x={111} y={43} />
     <path d="M75 135 C76 102 88 79 105 57" markerEnd={`url(#${arrowId})`} className="course-boat-art__route" />
     <path d="M143 135 C142 104 132 79 118 59" markerEnd={`url(#${arrowId})`} className="course-boat-art__route is-muted" />
-    <Boat x={86} y={99} heading={12} scale={0.65} tack="starboard" label="内側" />
-    <Boat x={141} y={105} heading={-12} scale={0.65} tack="starboard" label="外側" />
+    <Boat boatClass={boatClass} x={86} y={99} heading={12} scale={0.65} tack="starboard" label="内側" />
+    <Boat boatClass={boatClass} x={141} y={105} heading={-12} scale={0.65} tack="starboard" label="外側" />
   </>
 )
 
-const PenaltyScene = ({ arrowId }: { arrowId: string }) => (
+const PenaltyScene = ({ arrowId, boatClass }: SceneProps) => (
   <>
     <Wind />
     <path d="M83 119 C45 111 42 61 81 54 C118 48 131 89 104 112" markerEnd={`url(#${arrowId})`} className="course-boat-art__route" />
-    <Boat x={82} y={87} heading={76} scale={0.66} tack="port" />
-    <Boat x={174} y={54} heading={-7} scale={0.5} tack="starboard" />
+    <Boat boatClass={boatClass} x={82} y={87} heading={76} scale={0.66} tack="port" />
+    <Boat boatClass={boatClass} x={174} y={54} heading={-7} scale={0.5} tack="starboard" />
     <path d="M129 32 V127" className="course-boat-art__clear-line" />
     <text x="140" y="119" className="course-boat-art__note">まず離れる</text>
     <text x="21" y="23" className="course-boat-art__callout">1 / 2 TURNS</text>
   </>
 )
 
-const ObstructionScene = ({ arrowId }: { arrowId: string }) => (
+const ObstructionScene = ({ arrowId, boatClass }: SceneProps) => (
   <>
     <Wind />
     <path d="M183 30 H220 V150 H183Z" className="course-boat-art__breakwater" />
@@ -136,20 +143,20 @@ const ObstructionScene = ({ arrowId }: { arrowId: string }) => (
     <text x="202" y="23" textAnchor="middle" className="course-boat-art__note">防波堤</text>
     <path d="M145 130 V48" markerEnd={`url(#${arrowId})`} className="course-boat-art__route" />
     <path d="M96 130 V48" markerEnd={`url(#${arrowId})`} className="course-boat-art__route is-muted" />
-    <Boat x={145} y={94} scale={0.62} tack="starboard" label="内側" />
-    <Boat x={96} y={103} scale={0.62} tack="starboard" label="外側" />
+    <Boat boatClass={boatClass} x={145} y={94} scale={0.62} tack="starboard" label="内側" />
+    <Boat boatClass={boatClass} x={96} y={103} scale={0.62} tack="starboard" label="外側" />
     <path d="M162 74 H180 M162 70v8 M180 70v8" className="course-boat-art__measure" />
     <text x="171" y="66" textAnchor="middle" className="course-boat-art__callout">ROOM</text>
   </>
 )
 
-const FairScene = ({ arrowId }: { arrowId: string }) => (
+const FairScene = ({ arrowId, boatClass }: SceneProps) => (
   <>
     <Wind />
     <path d="M39 121 L104 34 L169 112" className="course-boat-art__course" />
     <CourseMark x={104} y={34} />
     <path d="M55 116 C69 89 83 66 99 47" markerEnd={`url(#${arrowId})`} className="course-boat-art__route" />
-    <Boat x={67} y={96} heading={25} scale={0.62} tack="starboard" />
+    <Boat boatClass={boatClass} x={67} y={96} heading={25} scale={0.62} tack="starboard" />
     <path d="M33 78q-13 9 0 18 M31 76l-6 2 4 5 M31 99l-6-2 4-5" className="course-boat-art__motion" />
     <path d="M24 72 L40 103" className="course-boat-art__stop" />
     <g transform="translate(146 37)">
@@ -161,7 +168,7 @@ const FairScene = ({ arrowId }: { arrowId: string }) => (
   </>
 )
 
-const RaceScene = ({ arrowId }: { arrowId: string }) => (
+const RaceScene = ({ arrowId, boatClass }: SceneProps) => (
   <>
     <Wind />
     <path d="M55 118 L106 34 L166 108 L55 118" className="course-boat-art__course" />
@@ -169,30 +176,31 @@ const RaceScene = ({ arrowId }: { arrowId: string }) => (
     <CourseMark x={106} y={34} />
     <CourseMark x={166} y={108} />
     <path d="M34 121 H81" className="course-boat-art__start-line" />
-    <Boat x={61} y={109} heading={26} scale={0.58} tack="starboard" />
+    <Boat boatClass={boatClass} x={61} y={109} heading={26} scale={0.58} tack="starboard" />
     <text x="20" y="137" className="course-boat-art__note">START</text>
   </>
 )
 
-const scenes: Record<CourseArtworkKind, (arrowId: string) => ReactNode> = {
-  signals: (arrowId) => <SignalScene arrowId={arrowId} />,
-  start: (arrowId) => <StartScene arrowId={arrowId} />,
-  meeting: (arrowId) => <MeetingScene arrowId={arrowId} />,
-  room: (arrowId) => <RoomScene arrowId={arrowId} />,
-  mark: (arrowId) => <MarkScene arrowId={arrowId} />,
-  penalty: (arrowId) => <PenaltyScene arrowId={arrowId} />,
-  obstruction: (arrowId) => <ObstructionScene arrowId={arrowId} />,
-  fair: (arrowId) => <FairScene arrowId={arrowId} />,
-  race: (arrowId) => <RaceScene arrowId={arrowId} />,
+const scenes: Record<CourseArtworkKind, (arrowId: string, boatClass: BoatClass) => ReactNode> = {
+  signals: (arrowId, boatClass) => <SignalScene arrowId={arrowId} boatClass={boatClass} />,
+  start: (arrowId, boatClass) => <StartScene arrowId={arrowId} boatClass={boatClass} />,
+  meeting: (arrowId, boatClass) => <MeetingScene arrowId={arrowId} boatClass={boatClass} />,
+  room: (arrowId, boatClass) => <RoomScene arrowId={arrowId} boatClass={boatClass} />,
+  mark: (arrowId, boatClass) => <MarkScene arrowId={arrowId} boatClass={boatClass} />,
+  penalty: (arrowId, boatClass) => <PenaltyScene arrowId={arrowId} boatClass={boatClass} />,
+  obstruction: (arrowId, boatClass) => <ObstructionScene arrowId={arrowId} boatClass={boatClass} />,
+  fair: (arrowId, boatClass) => <FairScene arrowId={arrowId} boatClass={boatClass} />,
+  race: (arrowId, boatClass) => <RaceScene arrowId={arrowId} boatClass={boatClass} />,
 }
 
 interface CourseBoatDiagramProps {
+  boatClass: BoatClass
   kind: CourseArtworkKind
   title: string
   caption: string
 }
 
-export function CourseBoatDiagram({ kind, title, caption }: CourseBoatDiagramProps) {
+export function CourseBoatDiagram({ boatClass, kind, title, caption }: CourseBoatDiagramProps) {
   const arrowId = `course-arrow-${useId().replaceAll(':', '')}`
 
   return (
@@ -204,7 +212,7 @@ export function CourseBoatDiagram({ kind, title, caption }: CourseBoatDiagramPro
           </marker>
         </defs>
         <path d="M5 34 H215 M5 75 H215 M5 116 H215 M54 5 V145 M108 5 V145 M162 5 V145" className="course-boat-art__grid" />
-        {scenes[kind](arrowId)}
+        {scenes[kind](arrowId, boatClass)}
       </svg>
       <figcaption>
         <span>LOOK</span>

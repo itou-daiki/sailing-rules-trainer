@@ -43,6 +43,7 @@ describe('PracticeSession', () => {
     const onAnswer = vi.fn()
     render(
       <PracticeSession
+        boatClass="420"
         questions={[question]}
         onAnswer={onAnswer}
         onFinish={vi.fn()}
@@ -70,6 +71,7 @@ describe('PracticeSession', () => {
     const onComplete = vi.fn()
     render(
       <PracticeSession
+        boatClass="420"
         questions={[observationQuestion]}
         onAnswer={onAnswer}
         onComplete={onComplete}
@@ -100,6 +102,7 @@ describe('PracticeSession', () => {
     const onAnswer = vi.fn()
     render(
       <PracticeSession
+        boatClass="420"
         questions={[observationQuestion]}
         reasoningOrder="decide-first"
         onAnswer={onAnswer}

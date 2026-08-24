@@ -20,4 +20,22 @@ describe('PlanViewDinghy', () => {
     expect(screen.getByTestId('sail-port-dinghy')).toHaveAttribute('data-sail-side', 'starboard')
     expect(screen.getByTestId('sail-starboard-dinghy')).toHaveAttribute('data-sail-side', 'port')
   })
+
+  it('帆のドラフトがブームより風下側へ張り出す', () => {
+    render(
+      <svg>
+        <PlanViewDinghy tack="port" testId="draft-port" />
+        <PlanViewDinghy tack="starboard" testId="draft-starboard" x={80} />
+      </svg>,
+    )
+
+    expect(screen.getByTestId('sail-draft-port')).toHaveAttribute(
+      'd',
+      'M0 -8 C8 -1 23 10 19 20 L0 -8Z',
+    )
+    expect(screen.getByTestId('sail-draft-starboard')).toHaveAttribute(
+      'd',
+      'M0 -8 C-8 -1 -23 10 -19 20 L0 -8Z',
+    )
+  })
 })

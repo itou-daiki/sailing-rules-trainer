@@ -56,14 +56,14 @@ export function PlanViewDinghy({
       <path d="M0 26 V36" className="plan-dinghy__rudder" data-boat-part="rudder" />
       <path d="M0 27 L0 15" className="plan-dinghy__tiller" aria-hidden="true" />
       <path
-        d={`M0 -8 C${4 * side} -1 ${12 * side} 10 ${boomX} 20 Q${18 * side} 23 ${14 * side} 21 C${8 * side} 14 ${3 * side} 6 0 0Z`}
+        d={`M0 -8 C${8 * side} -1 ${23 * side} 10 ${boomX} 20 L0 -8Z`}
         className="plan-dinghy__sail"
         data-boat-part="mainsail"
         data-sail-side={sailSide}
         data-testid={sailTestId}
       />
       <path
-        d={`M${3 * side} 1 Q${10 * side} 10 ${17 * side} 20`}
+        d={`M${5 * side} -1 Q${16 * side} 8 ${19 * side} 18`}
         className="plan-dinghy__sail-seam"
         aria-hidden="true"
       />

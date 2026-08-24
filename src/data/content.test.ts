@@ -86,4 +86,16 @@ describe('教材データ', () => {
       expect(formalReferences).toContain(`規則${ruleNumber}`)
     }
   })
+
+  it('問題文・選択肢・観察ステップは規則番号の暗記を前提にしない', () => {
+    const learnerFacingPrompts = quizQuestions.flatMap((question) => [
+      question.prompt,
+      ...question.choices,
+      ...(question.observation ? [question.observation.prompt] : []),
+    ])
+
+    expect(
+      learnerFacingPrompts.filter((prompt) => /規則\s*\d|part\s*2/i.test(prompt)),
+    ).toEqual([])
+  })
 })

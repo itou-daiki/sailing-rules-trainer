@@ -293,7 +293,15 @@ export function PracticeSession({
           <p className="eyebrow">{question.category === 'signal' ? 'SIGNAL' : 'SITUATION'}</p>
           <span>難度 {question.difficulty}</span>
         </div>
-        <h1 id="question-title">{question.prompt}</h1>
+        <h1 id="question-title" className={question.context ? 'has-context' : undefined}>
+          {question.prompt}
+        </h1>
+        {question.context ? (
+          <aside className="question-context" role="note" aria-label="ことばの補足">
+            <span>ことばの補足</span>
+            <p>{question.context}</p>
+          </aside>
+        ) : null}
         {flag ? <FlagArtwork kind={flag.artwork} label={flag.name} /> : null}
         {question.diagram ? <ScenarioBoard boatClass={boatClass} diagram={question.diagram} /> : null}
 

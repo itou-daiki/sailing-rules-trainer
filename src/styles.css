@@ -2291,6 +2291,40 @@ a {
   letter-spacing: -0.025em;
 }
 
+.question-sheet > h1.has-context {
+  margin-bottom: 16px;
+}
+
+.question-context {
+  display: grid;
+  grid-template-columns: 108px 1fr;
+  margin: 0 0 28px;
+  border-top: 1px solid var(--navy);
+  border-bottom: 1px solid var(--navy);
+  background: #edf5f5;
+}
+
+.question-context > span {
+  display: grid;
+  align-items: start;
+  padding: 15px 13px;
+  color: var(--navy);
+  background: var(--yellow);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.question-context > p {
+  margin: 0;
+  padding: 13px 16px 14px;
+  color: #31434e;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.8;
+}
+
 .observation-check {
   margin-bottom: 22px;
   border: 2px solid var(--navy);
@@ -4381,6 +4415,18 @@ a {
 
   .question-sheet > h1 {
     font-size: 22px;
+  }
+
+  .question-context {
+    grid-template-columns: 1fr;
+  }
+
+  .question-context > span {
+    padding: 9px 12px;
+  }
+
+  .question-context > p {
+    padding: 12px 13px 14px;
   }
 
   .observation-check > header,

@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { QuizQuestion } from '../data/content'
+import { quizQuestions, type QuizQuestion } from '../data/content'
 import { PracticeSession } from './PracticeSession'
 
 afterEach(cleanup)
@@ -39,6 +39,30 @@ const observationQuestion: QuizQuestion = {
 }
 
 describe('PracticeSession', () => {
+  it('番号を知らなくても問題を理解できる補足を、回答前に表示する', () => {
+    const supportedQuestion = quizQuestions.find((item) => item.id === 'q-r44-two-turns')
+    expect(supportedQuestion).toBeDefined()
+    if (!supportedQuestion) return
+
+    render(
+      <PracticeSession
+        boatClass="420"
+        questions={[supportedQuestion]}
+        onAnswer={vi.fn()}
+        onFinish={vi.fn()}
+        onRetry={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('note', { name: 'ことばの補足' })).toHaveTextContent(
+      '番号の暗記は不要です。',
+    )
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      '艇どうしの避け方に違反しました',
+    )
+    expect(screen.queryByText('規則44.1 ペナルティーの履行')).not.toBeInTheDocument()
+  })
+
   it('選択後に正誤と3段階の解説を表示する', () => {
     const onAnswer = vi.fn()
     render(
